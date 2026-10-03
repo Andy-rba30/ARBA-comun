@@ -61,7 +61,7 @@ namespace Arba.Comun
     /// </summary>
     internal static class ArbaContract
     {
-        public const string Version = "1.0.0";
+        public const string Version = "1.0.1";
 
         // ---------------------------------------------------------------- cinta
         public const string TabName = "ARBA";

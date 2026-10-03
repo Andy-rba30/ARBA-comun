@@ -8,13 +8,18 @@ namespace Arba.Comun
 {
     /// <summary>
     /// Base del comando "Migrar particiones y origen": migra la selección (anfitriones y/o armaduras) o, si no
-    /// hay nada seleccionado, todo el modelo, y muestra el resumen. Cada add-in lo expone así:
+    /// hay nada seleccionado, todo el modelo, y muestra el resumen. Esta clase es internal (como todo el código
+    /// común) y el comando de Revit tiene que ser público, así que cada add-in lo expone con un envoltorio:
     /// <code>
     /// [Transaction(TransactionMode.Manual)]
     /// [Regeneration(RegenerationOption.Manual)]
-    /// public class MigrarCommand : ArbaMigrateCommandBase { }
+    /// public class MigrarParticionesCommand : IExternalCommand
+    /// {
+    ///     private sealed class Migrador : ArbaMigrateCommandBase { }
+    ///     public Result Execute(ExternalCommandData c, ref string m, ElementSet e) => new Migrador().Execute(c, ref m, e);
+    /// }
     /// </code>
-    /// (los atributos van en la clase concreta: Revit los lee ahí). Con <see cref="OnlyPrefix"/> se limita a un add-in.
+    /// Con <see cref="OnlyPrefix"/> se limita a un add-in.
     /// </summary>
     internal abstract class ArbaMigrateCommandBase : IExternalCommand
     {

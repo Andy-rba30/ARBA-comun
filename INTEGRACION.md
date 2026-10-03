@@ -35,7 +35,9 @@ En el `.csproj`, después del `PropertyGroup` principal:
 
 El `.props` compila `external/ARBA-comun/src/**/*.cs` dentro del ensamblado del add-in (clases `internal` en
 `namespace Arba.Comun`) y define `REVIT2027` (o la versión indicada). No añade paquetes: el add-in sigue trayendo
-`Nice3point.Revit.Api.RevitAPI/RevitAPIUI` (o `RevitAPI.dll` por `HintPath`) y `UseWPF`.
+`Nice3point.Revit.Api.RevitAPI/RevitAPIUI` (o `RevitAPI.dll` por `HintPath`) y `UseWPF`. Un proyecto que referencia
+`RevitAPI.dll` por `HintPath` puede añadir, como respaldo para compilar sin Revit (Linux, CI), los paquetes
+`Nice3point.Revit.Api.*` con `Condition="!Exists('$(RevitInstallDir)\RevitAPI.dll')"` y `ExcludeAssets="runtime"`.
 
 Si el proyecto de tests de consola del add-in enlaza `..\PartitionName.cs`, cámbialo por los archivos puros del
 común: `..\external\ARBA-comun\src\ArbaContract.cs`, `ArbaPartition.cs`, `PartitionName.cs`, `NameMatch.cs`.
@@ -85,9 +87,10 @@ Barras anteriores al contrato (partición antigua, sin origen): `ArbaMigration.H
 
 ## 7. Migración de modelos existentes: botón "Migrar particiones y origen"
 
-Lo aporta **Exportacion-metrados-excel** (botón `ARBA_Metrados_Migrar`, clase `MigrarCommand : ArbaMigrateCommandBase`
-con `[Transaction(TransactionMode.Manual)]`): sin selección migra todo el modelo; con selección, los anfitriones
-elegidos. Convierte `ZAP-Z1` → `CIMIENTOS - ZAP-Z1`, `CC-C1` → `MUROS - CCO-C1` (categoría del anfitrión real),
+Lo aporta **Exportacion-metrados-excel** (botón `ARBA_Metrados_Migrar`, clase pública `MigrarParticionesCommand :
+IExternalCommand` con `[Transaction(TransactionMode.Manual)]` que delega en una subclase privada de
+`ArbaMigrateCommandBase`, porque el código común es `internal` y una clase pública no puede heredar de él): sin
+selección migra todo el modelo; con selección, los anfitriones elegidos. Convierte `ZAP-Z1` → `CIMIENTOS - ZAP-Z1`, `CC-C1` → `MUROS - CCO-C1` (categoría del anfitrión real),
 `BLQ-FT-01-F1` → `CIMIENTOS - BLQ-FT-01-F1`, `LOSA-L1` → `LOSAS - LOS-L1`, `MC-M1` → `…- MCO-M1`; rellena
 `ARBA - Origen`, `ARBA - Código` (si la partición lo llevaba) y `Metrado - Elemento`; no toca las particiones de solo
 categoría ni las desconocidas; no crea ni borra barras; Ctrl+Z lo deshace. Los add-ins de armado no duplican el botón

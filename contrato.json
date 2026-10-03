@@ -1,6 +1,6 @@
 {
   "contrato": "ARBA-comun",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
 
   "conjuntosCategorias": {
@@ -83,7 +83,7 @@
       "valores": ["kg, 3 decimales"],
       "escribe": ["Exportacion-metrados-excel (armaduras, perfiles y piezas sin peso propio)", "Fosa_transformadores en rejillas (m² × kg/m²) y ángulos (m × kg/m)"],
       "lee": ["Exportacion-metrados-excel: columnas y totales de las tablas, Excel"],
-      "descripcion": "Peso en kg. El plugin de metrados NO sobrescribe un valor > 0 en un elemento con 'ARBA - Origen' no vacío. GUID conservado del plugin actual."
+      "descripcion": "Peso en kg. El plugin de metrados NO sobrescribe un valor > 0 en un elemento que no es armadura y tiene ARBA - Origen (rejillas, ángulos); en las armaduras lo calcula siempre. GUID conservado del plugin actual."
     },
     {
       "clave": "Pernos",

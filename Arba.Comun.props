@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <ArbaComunDir Condition="'$(ArbaComunDir)' == ''">$(MSBuildThisFileDirectory)</ArbaComunDir>
-    <ArbaComunVersion>1.0.0</ArbaComunVersion>
+    <ArbaComunVersion>1.0.1</ArbaComunVersion>
 
     <!-- Versión de Revit: se infiere del TargetFramework cuando el add-in no la declara.
          net10.0-windows -> 2027; net8.0-windows -> 2026 (misma API que 2025 para este código); net48 -> 2024.

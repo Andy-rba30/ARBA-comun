@@ -2,7 +2,7 @@
 
 Código fuente común y **contrato** compartido por todos los add-ins de Revit ARBA (armado de zapatas, cimientos
 corridos, bloques con foso, vigas, columnas, losas y muros de contención, y el plugin de metrados). Versión del
-contrato: **1.0.0** (etiqueta `v1.0.0`).
+contrato: **1.0.1** (etiqueta `v1.0.1`).
 
 | Documento | Qué contiene |
 |---|---|

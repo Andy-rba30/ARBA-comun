@@ -24,10 +24,12 @@ namespace Arba.Comun
         }
 
         /// <summary>
-        /// True si el plugin de metrados NO debe sobrescribir "Metrado - Peso (kg)": el elemento tiene origen ARBA
-        /// y un peso mayor que cero escrito por su add-in.
+        /// True si el plugin de metrados NO debe sobrescribir "Metrado - Peso (kg)": el elemento NO es armadura
+        /// (en las armaduras el único que escribe el peso es el plugin de metrados y debe actualizarlo), tiene origen
+        /// ARBA y un peso mayor que cero escrito por su add-in (rejillas, ángulos).
         /// </summary>
-        public static bool PesoProtegido(Element e) => ArbaOrigin.IsArba(e) && ArbaSharedParams.GetDouble(e, ArbaContract.Peso) > 0;
+        public static bool PesoProtegido(Element e) =>
+            e != null && !ArbaPartition.IsRebar(e) && ArbaOrigin.IsArba(e) && ArbaSharedParams.GetDouble(e, ArbaContract.Peso) > 0;
 
         /// <summary>True si el elemento es un misceláneo del contrato (tiene "Metrado - Partida").</summary>
         public static bool EsMiscelaneo(Element e) => ArbaSharedParams.GetText(e, ArbaContract.Partida).Trim().Length > 0;

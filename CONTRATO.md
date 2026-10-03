@@ -1,4 +1,4 @@
-# Contrato ARBA-comun — versión 1.0.0
+# Contrato ARBA-comun — versión 1.0.1
 
 Este documento describe lo que todos los add-ins ARBA comparten. La fuente de verdad legible por máquina es
 `contrato.json`; el código la refleja en `src/ArbaContract.cs` y los tests de `tests/` comprueban que los tres
@@ -18,7 +18,7 @@ solo por nombre.
 | **ARBA - Anfitrión** | `F5CE04ED-FD80-4C5E-88EF-1EA46162E8C9` | texto | Armazón, pilares, modelos genéricos, conexiones, rigidizadores, cubiertas (lo que un add-in crea y **no** es armadura) | Fosa_transformadores en rejillas y ángulos (Id del bloque como texto) | `ArbaOrigin.Find`/`Delete` para "borrar y rearmar" sin Comentarios. *Añadido respecto a la lista inicial:* las armaduras conocen su anfitrión por la API, los `FamilyInstance` no |
 | **Metrado - Partida** | `379229AB-6C40-4CFC-81B7-10DF6468B842` | texto | Armazón, pilares, modelos genéricos, conexiones, rigidizadores, cubiertas | Fosa_transformadores (`ESTRUCTURAS METÁLICAS - REJILLAS`, `ESTRUCTURAS METÁLICAS - ÁNGULOS`); el usuario a mano | Plugin de metrados: tabla multicategoría "Metrado acero estructural - Misceláneos" agrupada por partida |
 | **Metrado - Material** | `5B7E3C1A-2D4F-4A6B-9C8D-0E1F2A3B4C5D` | texto | Armazón, pilares, cimentaciones, suelos, muros, rigidizadores, conexiones, modelos genéricos, cubiertas | Plugin de metrados (`CONCRETO`, `ACERO ESTRUCTURAL`, `MADERA`, `OTRO`); Fosa_transformadores escribe `ACERO ESTRUCTURAL` en rejillas y ángulos | Plugin de metrados (filtros de tablas y de vista, resumen) |
-| **Metrado - Peso (kg)** | `7D2A9F4E-6B1C-4C3D-8E5F-1A2B3C4D5E6F` | número | Armaduras, mallas, armazón, pilares, rigidizadores, conexiones, modelos genéricos, cubiertas | Plugin de metrados (armaduras, perfiles, piezas); Fosa_transformadores en rejillas (m² × kg/m²) y ángulos (m × kg/m). **El plugin no sobrescribe un valor > 0 si `ARBA - Origen` no está vacío** | Plugin de metrados (columnas y totales), Excel |
+| **Metrado - Peso (kg)** | `7D2A9F4E-6B1C-4C3D-8E5F-1A2B3C4D5E6F` | número | Armaduras, mallas, armazón, pilares, rigidizadores, conexiones, modelos genéricos, cubiertas | Plugin de metrados (armaduras, perfiles, piezas); Fosa_transformadores en rejillas (m² × kg/m²) y ángulos (m × kg/m). **El plugin no sobrescribe un valor > 0 en un elemento que no es armadura y tiene `ARBA - Origen`** (en las armaduras el peso lo calcula siempre el plugin) | Plugin de metrados (columnas y totales), Excel |
 | **Metrado - Pernos (und)** | `E63C6327-2A69-469F-A237-947AF6BF6AB7` | entero | Armazón, pilares, modelos genéricos, conexiones, rigidizadores | Fosa_transformadores en cada ángulo (`boltsPerAngle`) | Plugin de metrados (suma por partida en la tabla de misceláneos y en el Excel) |
 | **Metrado - Elemento** | `9A4C7E21-3B5D-4F8A-A6C2-2D3E4F5A6B7C` | texto | Armaduras, mallas y todas las categorías de anfitrión | Plugin de metrados siempre (`VIGAS`, `COLUMNAS`, `CIMIENTOS`, `LOSAS`, `MUROS`, `CONEXIONES`, `OTROS`; `MISCELANEOS` si el elemento tiene `Metrado - Partida`); cada add-in al crear, con la CATEGORIA de la partición (prerrelleno); Fosa_transformadores escribe `MISCELANEOS` en rejillas y ángulos | Plugin de metrados: es el filtro real de "Metrado acero - <elemento>" y de los filtros de vista |
 
@@ -35,6 +35,8 @@ Decisiones:
   Vigas / Conexiones / Otros (que filtran por ese parámetro) y los lleva a la tabla "Metrado acero estructural -
   Misceláneos" agrupada por partida, sin contar dos veces el peso.
 - Valores de texto siempre en **mayúsculas sin acentos** salvo `Metrado - Partida` (libre, se recomienda mayúsculas).
+- `Metrado - Partida` está pensada para piezas metálicas metradas por peso; un elemento de concreto con partida pasa
+  también al grupo MISCELANEOS y el plugin lo metra en "Metrado concreto - Misceláneos - <categoría>".
 
 ## 2. Partición del acero
 
