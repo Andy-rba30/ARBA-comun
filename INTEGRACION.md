@@ -129,3 +129,26 @@ con `OnlyPrefix => ArbaContract.<Prefijo>` y `ArbaRibbon.AddAcero`.
 
 Entre cada paso: compilar, probar en Revit con la lista del apartado 8 y fusionar antes de pasar al siguiente, para
 no tener dos add-ins a medias con la cinta compartida.
+
+## 10. Mantenimiento: cambiar ARBA-comun sin reescribir los add-ins
+
+El común entra como código fuente por submódulo, así que un cambio en ARBA-comun llega a un add-in con dos
+comandos y una recompilación, sin tocar su código:
+
+```powershell
+git -C external/ARBA-comun fetch --tags origin
+git -C external/ARBA-comun checkout v1.0.2
+git add external/ARBA-comun && git commit -m "Submodulo ARBA-comun v1.0.2" && git push
+```
+
+Solo un cambio **MAJOR** del contrato (`CONTRATO.md` §4) obliga a editar código en los add-ins; MINOR y PATCH no.
+
+Para hacerlo en los ocho a la vez: `tools/actualizar-arba-comun.ps1 -Version v1.0.2 -Repos <carpetas> [-Build]`
+(salta los repos con cambios sin confirmar y resume el resultado en una tabla). Para no tener que acordarse,
+`tools/dependabot-submodulo.yml` copiado como `.github/dependabot.yml` en cada add-in hace que GitHub abra un pull
+request en ese repo cada vez que avance `main` de ARBA-comun.
+
+Cuando los ocho estén integrados y probados, la opción más cómoda a largo plazo es un **monorepo** (un repo `ARBA`
+con una carpeta por add-in, el común como carpeta normal y una sola solución): un commit cambia todo, una compilación
+prueba todo y una sesión de Claude Code ve todo. Migrar es mecánico (`git subtree add` por repo conserva el
+historial), pero conviene no hacerlo a mitad de la integración.
