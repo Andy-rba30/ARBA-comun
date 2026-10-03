@@ -118,6 +118,13 @@ namespace Arba.Comun
                     body = t.Substring(sep + ArbaContract.CategorySeparator.Length).Trim();
                 }
             }
+            if (info.Category.Length == 0 && t.EndsWith(" -", StringComparison.Ordinal) && IsCategory(t.Substring(0, t.Length - 2)))
+            {
+                // "VIGAS - " (separador sin nada detrás)
+                info.Category = Normalize(t.Substring(0, t.Length - 2));
+                info.Kind = ArbaPartitionKind.CategoryOnly;
+                return info;
+            }
             if (info.Category.Length == 0 && IsCategory(t))
             {
                 info.Category = Normalize(t);

@@ -67,7 +67,6 @@ namespace Arba.Comun
                         result = ArbaMigration.MigrateHosts(doc, hosts, OnlyPrefix);
                         if (rebars.Count > 0)
                         {
-                            var ids = new HashSet<ElementId>(rebars.Select(x => x.Id));
                             ArbaMigrationResult r2 = ArbaMigration.MigrateHosts(doc,
                                 rebars.Select(x => doc.GetElement(ArbaPartition.RebarHostId(x))).Where(h => h != null).Distinct(), OnlyPrefix);
                             result.Avisos.AddRange(r2.Avisos);

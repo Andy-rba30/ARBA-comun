@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Pruebas de consola sin Revit: ArbaPartition, PartitionName, NameMatch, unicidad de GUID y coherencia
+       entre contrato.json y ArbaContract.   dotnet run (desde esta carpeta). Código de salida 1 si algo falla. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>Arba.Comun.Tests</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- solo las clases puras del código común -->
+    <Compile Include="../src/ArbaContract.cs" Link="Arba.Comun/ArbaContract.cs" />
+    <Compile Include="../src/ArbaPartition.cs" Link="Arba.Comun/ArbaPartition.cs" />
+    <Compile Include="../src/PartitionName.cs" Link="Arba.Comun/PartitionName.cs" />
+    <Compile Include="../src/NameMatch.cs" Link="Arba.Comun/NameMatch.cs" />
+    <None Include="../contrato.json" Link="contrato.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
