@@ -1,4 +1,4 @@
-# Contrato ARBA-comun — versión 1.0.3
+# Contrato ARBA-comun — versión 1.0.4
 
 Este documento describe lo que todos los add-ins ARBA comparten. La fuente de verdad legible por máquina es
 `contrato.json`; el código la refleja en `src/ArbaContract.cs` y los tests de `tests/` comprueban que los tres
@@ -44,12 +44,20 @@ Decisiones:
 <CATEGORIA> - <PREFIJO>-{marca}-{código}
 ```
 
-- **CATEGORIA** se deduce de la categoría del **anfitrión**, nunca del add-in:
+- **CATEGORIA** (desde 1.0.4) la fija el **prefijo** cuando el add-in sabe qué arma: `ZAP`, `CCO` y `BLQ` →
+  `CIMIENTOS`; `VIG` → `VIGAS`; `COL` → `COLUMNAS`; `LOS` → `LOSAS`; `MUR` → `MUROS`. Da igual cómo esté modelado
+  el anfitrión: una zapata o un cimiento corrido dibujados como suelo son `CIMIENTOS - ZAP-…` / `CIMIENTOS - CCO-…`
+  y se metran en Cimentaciones, no en Losas (en 1.0.0–1.0.3 salían `LOSAS - CCO-…`; "Migrar particiones y origen"
+  los corrige).
+- Solo cuando el prefijo **no fija** categoría (`MCO`, `MAN`) se deduce de la categoría del **anfitrión**:
   `OST_StructuralFoundation` → `CIMIENTOS`, `OST_StructuralFraming` → `VIGAS`, `OST_StructuralColumns` (y
-  `OST_Columns`) → `COLUMNAS`, `OST_Floors` → `LOSAS`, `OST_Walls` → `MUROS`; cualquier otra → `OTROS`.
-  Coincide con los grupos del plugin de metrados y con `Metrado - Elemento`. Consecuencia asumida: un sobrecimiento
-  armado por Acero-cimientos-corridos pero modelado como muro queda en `MUROS - CCO-…` (es como ya lo agrupa el
-  metrado); el prefijo conserva quién lo armó.
+  `OST_Columns`) → `COLUMNAS`, `OST_Floors` → `LOSAS`, `OST_Walls` → `MUROS`; cualquier otra → `OTROS`. Así la
+  pantalla de un muro de contención queda en `MUROS - MCO-M1` y su zapata en `CIMIENTOS - MCO-M1`, cada una en su
+  tabla; y el acero manual sigue al elemento que lo aloja.
+- `Metrado - Elemento` sigue la misma regla (`ArbaMetrado.ElementoFor`): la categoría que **declara la partición**
+  (la fija de su prefijo, o la del texto en `MUROS - MCO-M1` y en las de solo categoría como `CIMIENTOS`) y, solo si
+  la partición no declara ninguna (texto libre, antigua `MC-M1`, vacía), la del anfitrión. Una partición
+  `CIMIENTOS` escrita a mano en barras de un suelo se metra en Cimentaciones.
 - **Separador de categoría**: ` - ` (espacio, guion, espacio). **Separador de campos**: `-`.
 - **{marca}**: parámetro Marca del anfitrión; si está vacía, su Id. Excepción: con el prefijo `MAN` (acero no
   creado por ARBA) una marca vacía usa el **nombre del tipo** del anfitrión (`CIMIENTOS - MAN-Z1_1.5x1.5m`), que
@@ -62,19 +70,19 @@ Decisiones:
   pero una plantilla que no empieza por `{categoria} - {prefijo}-` incumple el contrato y la ventana lo avisa
   (`ArbaPartition.TemplateFollowsContract`).
 
-Prefijos (tres letras, uno por add-in; el prefijo identifica **quién armó**, la categoría dice **dónde**):
+Prefijos (tres letras, uno por add-in; el prefijo identifica **quién armó** y, desde 1.0.4, fija **dónde** se metra):
 
-| Prefijo | ARBA - Origen | Add-in | Antes | Motivo del ajuste |
-|---|---|---|---|---|
-| `ZAP` | `ZAPATAS` | Acero-Zapatas | `ZAP` | — |
-| `CCO` | `CIMIENTOS CORRIDOS` | Acero-cimientos-corridos | `CC` | tres letras uniformes |
-| `BLQ` | `BLOQUES` | Fosa_transformadores | `BLQ` | — |
-| `VIG` | `VIGAS` | Acero-vigas | `VIG` | — |
-| `COL` | `COLUMNAS` | Acero-columnas | `COL` | — |
-| `LOS` | `LOSAS` | Acero-losas | `LOSA` | tres letras uniformes |
-| `MCO` | `MUROS DE CONTENCION` | Acero-automatico (muros de contención) | `MC` | tres letras; es un add-in distinto de los muros estructurales |
-| `MUR` | `MUROS` | reservado para un futuro add-in de placas | — | propuesto en el encargo; no lo usa ningún repo hoy |
-| `MAN` | `MANUAL` | Exportacion-metrados-excel ("Asignar partición" en armaduras sin origen ARBA) | — | permite que el acero manual siga la misma gramática (`VIGAS - MAN-V1`) |
+| Prefijo | ARBA - Origen | Add-in | Categoría | Antes | Motivo del ajuste |
+|---|---|---|---|---|---|
+| `ZAP` | `ZAPATAS` | Acero-Zapatas | `CIMIENTOS` (fija) | `ZAP` | — |
+| `CCO` | `CIMIENTOS CORRIDOS` | Acero-cimientos-corridos | `CIMIENTOS` (fija) | `CC` | tres letras uniformes |
+| `BLQ` | `BLOQUES` | Fosa_transformadores | `CIMIENTOS` (fija) | `BLQ` | — |
+| `VIG` | `VIGAS` | Acero-vigas | `VIGAS` (fija) | `VIG` | — |
+| `COL` | `COLUMNAS` | Acero-columnas | `COLUMNAS` (fija) | `COL` | — |
+| `LOS` | `LOSAS` | Acero-losas | `LOSAS` (fija) | `LOSA` | tres letras uniformes |
+| `MCO` | `MUROS DE CONTENCION` | Acero-automatico (muros de contención) | la del anfitrión (pantalla `MUROS`, zapata `CIMIENTOS`) | `MC` | tres letras; es un add-in distinto de los muros estructurales |
+| `MUR` | `MUROS` | reservado para un futuro add-in de placas | `MUROS` (fija) | — | propuesto en el encargo; no lo usa ningún repo hoy |
+| `MAN` | `MANUAL` | Exportacion-metrados-excel ("Asignar partición" en armaduras sin origen ARBA) | la del anfitrión | — | permite que el acero manual siga la misma gramática (`VIGAS - MAN-V1`) |
 
 Ejemplos: `CIMIENTOS - ZAP-Z1`, `CIMIENTOS - BLQ-FT-01-F4`, `VIGAS - VIG-V-101`, `COLUMNAS - COL-C3`,
 `LOSAS - LOS-L2`, `MUROS - MCO-MC1`, `CIMIENTOS - CCO-1234` (sin marca, con Id), `VIGAS - MAN-V7`,
@@ -123,6 +131,12 @@ armar un anfitrión con barras antiguas suyas pueden migrarlas con `ArbaMigratio
   pestaña, un panel, el desplegable o un nombre interno de botón.
 - **MINOR (no rompe)**: añadir parámetros (GUID nuevo), prefijos, valores de origen, categorías de vinculación,
   botones, paneles, comodines o alias.
+- **Historial**: 1.0.1 el peso protegido excluye armaduras; 1.0.2 `MAN` sin marca usa el nombre del tipo; 1.0.3 el
+  `.props` excluye el submódulo del glob del SDK y `{capa}` tiene subcapa propia; 1.0.4 categoría fija por prefijo
+  (`ArbaPrefix.Category`, `ArbaPartition.CategoryFor`), `Metrado - Elemento` respeta la categoría que declara la
+  partición (`ArbaMetrado.ElementoFor`) y la migración corrige categoría y elemento. Ningún GUID, nombre, prefijo ni
+  comodín ha cambiado: los add-ins integrados solo actualizan el submódulo y recompilan; el plugin de metrados
+  cambia una línea (`PROMPTS/09-Exportacion-metrados-excel-1.0.4.md`).
 - **PATCH**: descripciones, iconos, textos de botón, documentación.
 - **Parámetros antiguos**: `ArbaSharedParams.Ensure` busca un parámetro vinculado con el mismo nombre; si su GUID es
   el del contrato solo completa las categorías; si es un parámetro de proyecto no compartido o con otro GUID, crea
@@ -130,7 +144,9 @@ armar un anfitrión con barras antiguas suyas pueden migrarlas con `ArbaMigratio
   valores.
 - **Particiones antiguas**: siguen metrándose (el plugin filtra por `Metrado - Elemento`). "Migrar particiones y
   origen" las convierte a la forma nueva, rellena `ARBA - Origen`, `ARBA - Código` (si la partición lo contenía) y
-  `Metrado - Elemento`, sin rearmar nada. Un add-in que encuentra barras antiguas suyas en un anfitrión no las
+  `Metrado - Elemento`, sin rearmar nada. Desde 1.0.4 también corrige las particiones de 1.0.0–1.0.3 cuya categoría
+  salió del anfitrión y no del prefijo (`LOSAS - CCO-12` → `CIMIENTOS - CCO-12`) y el `Metrado - Elemento` que no
+  coincide con la categoría de la partición. Un add-in que encuentra barras antiguas suyas en un anfitrión no las
   reconoce como propias hasta migrarlas (no hay `ARBA - Origen`), así que ofrece migrar antes de rearmar.
 - **Mezcla de versiones** durante la integración: la pestaña, el desplegable `Acero` y los nombres de parámetro
   no cambian, así que un add-in viejo y uno nuevo conviven en la misma cinta y el mismo modelo.

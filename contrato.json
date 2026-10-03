@@ -1,6 +1,6 @@
 {
   "contrato": "ARBA-comun",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
 
   "conjuntosCategorias": {
@@ -119,6 +119,7 @@
     "marcaVaciaUsaId": true,
     "marcaVaciaMAN": "tipo",
     "categoriaPorDefecto": "OTROS",
+    "categoriaFijaDelPrefijo": "Desde 1.0.4 la CATEGORIA es la que fija el prefijo ('categoria' de cada prefijo: ZAP, CCO y BLQ → CIMIENTOS; VIG, COL, LOS, MUR → la suya) aunque el anfitrión esté modelado como otra cosa (una zapata o un cimiento corrido dibujados como suelo siguen siendo CIMIENTOS). Con 'categoria' null (MCO: pantalla MUROS y zapata CIMIENTOS; MAN) se usa la categoría del anfitrión según 'categorias'. 'Metrado - Elemento' sigue la misma regla (ArbaMetrado.ElementoFor): la categoría que declara la partición y, si no declara ninguna, la del anfitrión.",
     "categorias": {
       "CIMIENTOS": ["OST_StructuralFoundation"],
       "VIGAS": ["OST_StructuralFraming"],
@@ -127,15 +128,15 @@
       "MUROS": ["OST_Walls"]
     },
     "prefijos": [
-      { "prefijo": "ZAP", "origen": "ZAPATAS",             "repo": "Acero-Zapatas",            "antiguos": ["ZAP"],  "codigos": ["inferior", "inferior-sec", "superior", "superior-sec"], "plantillaAntigua": "ZAP-{marca}" },
-      { "prefijo": "CCO", "origen": "CIMIENTOS CORRIDOS",  "repo": "Acero-cimientos-corridos", "antiguos": ["CC"],   "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "CC-{marca}" },
-      { "prefijo": "BLQ", "origen": "BLOQUES",             "repo": "Fosa_transformadores",     "antiguos": ["BLQ"],  "codigos": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"], "plantillaAntigua": "BLQ-{marca}-{familia}" },
-      { "prefijo": "VIG", "origen": "VIGAS",               "repo": "Acero-vigas",              "antiguos": ["VIG"],  "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "VIG-{marca}" },
-      { "prefijo": "COL", "origen": "COLUMNAS",            "repo": "Acero-columnas",           "antiguos": ["COL"],  "codigos": [], "plantillaAntigua": "COL-{marca}" },
-      { "prefijo": "LOS", "origen": "LOSAS",               "repo": "Acero-losas",              "antiguos": ["LOSA"], "codigos": ["inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura"], "plantillaAntigua": "LOSA-{marca}" },
-      { "prefijo": "MCO", "origen": "MUROS DE CONTENCION", "repo": "Acero-automatico",         "antiguos": ["MC"],   "codigos": [], "plantillaAntigua": "MC-{marca}" },
-      { "prefijo": "MUR", "origen": "MUROS",               "repo": "(reservado: futuro add-in de placas / muros estructurales)", "antiguos": [], "codigos": [], "plantillaAntigua": "" },
-      { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "", "marcaVacia": "tipo" }
+      { "prefijo": "ZAP", "origen": "ZAPATAS",             "repo": "Acero-Zapatas",            "antiguos": ["ZAP"],  "codigos": ["inferior", "inferior-sec", "superior", "superior-sec"], "plantillaAntigua": "ZAP-{marca}", "categoria": "CIMIENTOS" },
+      { "prefijo": "CCO", "origen": "CIMIENTOS CORRIDOS",  "repo": "Acero-cimientos-corridos", "antiguos": ["CC"],   "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "CC-{marca}", "categoria": "CIMIENTOS" },
+      { "prefijo": "BLQ", "origen": "BLOQUES",             "repo": "Fosa_transformadores",     "antiguos": ["BLQ"],  "codigos": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"], "plantillaAntigua": "BLQ-{marca}-{familia}", "categoria": "CIMIENTOS" },
+      { "prefijo": "VIG", "origen": "VIGAS",               "repo": "Acero-vigas",              "antiguos": ["VIG"],  "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "VIG-{marca}", "categoria": "VIGAS" },
+      { "prefijo": "COL", "origen": "COLUMNAS",            "repo": "Acero-columnas",           "antiguos": ["COL"],  "codigos": [], "plantillaAntigua": "COL-{marca}", "categoria": "COLUMNAS" },
+      { "prefijo": "LOS", "origen": "LOSAS",               "repo": "Acero-losas",              "antiguos": ["LOSA"], "codigos": ["inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura"], "plantillaAntigua": "LOSA-{marca}", "categoria": "LOSAS" },
+      { "prefijo": "MCO", "origen": "MUROS DE CONTENCION", "repo": "Acero-automatico",         "antiguos": ["MC"],   "codigos": [], "plantillaAntigua": "MC-{marca}", "categoria": null },
+      { "prefijo": "MUR", "origen": "MUROS",               "repo": "(reservado: futuro add-in de placas / muros estructurales)", "antiguos": [], "codigos": [], "plantillaAntigua": "", "categoria": "MUROS" },
+      { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "", "marcaVacia": "tipo", "categoria": null }
     ],
     "comodines": ["{categoria}", "{prefijo}", "{marca}", "{id}", "{codigo}", "{tipo}", "{familia}", "{conjunto}", "{capa}", "{cara}", "{estribo}", "{ala}", "{familiarevit}"],
     "alias": { "{capa}": "{codigo}", "{cara}": "{codigo}", "{estribo}": "{codigo}", "{ala}": "{codigo}", "{familiarevit}": "{familia}" },

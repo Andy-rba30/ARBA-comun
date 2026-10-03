@@ -27,12 +27,14 @@ namespace Arba.Comun
     {
         /// <summary>
         /// Marca un elemento recién creado: origen del add-in, código (capa / familia), anfitrión (solo si no es
-        /// armadura) y "Metrado - Elemento" con la categoría del anfitrión. Devuelve false si no se pudo escribir el origen.
+        /// armadura) y "Metrado - Elemento" con la categoría de la partición (la fija del prefijo o la del anfitrión,
+        /// ver ArbaPartition.CategoryFor). Devuelve false si no se pudo escribir el origen.
         /// </summary>
         public static bool WriteFor(Element created, Element host, ArbaPrefix prefix, string code)
         {
             if (created == null || prefix == null) return false;
-            return Write(created, prefix.Origin, code, host?.Id, host != null ? ArbaPartition.CategoryOf(host) : null);
+            string elemento = host != null || !string.IsNullOrWhiteSpace(prefix.Category) ? ArbaPartition.CategoryFor(host, prefix) : null;
+            return Write(created, prefix.Origin, code, host?.Id, elemento);
         }
 
         public static bool Write(Element e, string origin, string code, ElementId hostId = null, string metradoElemento = null)

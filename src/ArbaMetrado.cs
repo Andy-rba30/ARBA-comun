@@ -36,5 +36,21 @@ namespace Arba.Comun
 
         /// <summary>Escribe "Metrado - Elemento" (grupo de metrado) si el elemento tiene el parámetro.</summary>
         public static bool WriteElemento(Element e, string grupo) => ArbaSharedParams.SetText(e, ArbaContract.Elemento, (grupo ?? "").Trim().ToUpperInvariant());
+
+        /// <summary>
+        /// Grupo de metrado ("Metrado - Elemento") que le toca a una armadura: lo que declara su partición (la
+        /// categoría fija de su prefijo, o la del texto: "CIMIENTOS - ZAP-Z1", "LOSAS - CCO-12" → CIMIENTOS,
+        /// "MUROS - MCO-M1", "CIMIENTOS") y, si la partición no declara ninguna (texto libre, antigua "MC-M1", vacía),
+        /// <paramref name="hostGroup"/> (el grupo que el plugin de metrados asigna a la categoría del anfitrión) o,
+        /// en su defecto, la categoría del anfitrión; OTROS sin anfitrión. Así una zapata o un cimiento modelados
+        /// como suelo se metran en Cimentaciones y no en Losas.
+        /// </summary>
+        public static string ElementoFor(Element rebar, Element host, string hostGroup = null)
+        {
+            string declared = ArbaPartition.DeclaredCategory(ArbaPartition.ParseOf(rebar));
+            if (declared.Length > 0) return declared;
+            if (!string.IsNullOrWhiteSpace(hostGroup)) return hostGroup.Trim().ToUpperInvariant();
+            return host != null ? ArbaPartition.CategoryOf(host) : ArbaContract.CatOtros;
+        }
     }
 }

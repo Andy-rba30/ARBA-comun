@@ -11,7 +11,7 @@ namespace Arba.Comun
     internal sealed class ArbaMigrationResult
     {
         public int Revisadas, Migradas, YaConformes, SoloCategoria, Desconocidas, SinAnfitrion;
-        public int ParticionesCambiadas, OrigenEscrito;
+        public int ParticionesCambiadas, OrigenEscrito, ElementoCorregido;
         public readonly Dictionary<string, int> PorPrefijo = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         public readonly List<string> Avisos = new List<string>();
 
@@ -20,7 +20,7 @@ namespace Arba.Comun
             var sb = new StringBuilder();
             sb.AppendLine("Armaduras revisadas: " + Revisadas);
             sb.AppendLine("Migradas (partición nueva y/u origen escrito): " + Migradas);
-            sb.AppendLine("  particiones reescritas: " + ParticionesCambiadas + ", orígenes escritos: " + OrigenEscrito);
+            sb.AppendLine("  particiones reescritas: " + ParticionesCambiadas + ", orígenes escritos: " + OrigenEscrito + ", \"Metrado - Elemento\" corregidos: " + ElementoCorregido);
             sb.AppendLine("Ya conformes con el contrato: " + YaConformes);
             sb.AppendLine("Solo categoría (del plugin de metrados), sin tocar: " + SoloCategoria);
             sb.AppendLine("Sin forma reconocida, sin tocar: " + Desconocidas);
@@ -39,9 +39,11 @@ namespace Arba.Comun
 
     /// <summary>
     /// Migra modelos existentes al contrato SIN rearmar: convierte las particiones antiguas ("ZAP-Z1" →
-    /// "CIMIENTOS - ZAP-Z1", "BLQ-FT-01-F1" → "CIMIENTOS - BLQ-FT-01-F1", "LOSA-L1" → "LOSAS - LOS-L1"...),
-    /// rellena "ARBA - Origen" (y "ARBA - Código" si la partición lo contenía) y "Metrado - Elemento" con la
-    /// categoría del anfitrión real. Asegura antes los parámetros del contrato. Dentro de una transacción.
+    /// "CIMIENTOS - ZAP-Z1", "BLQ-FT-01-F1" → "CIMIENTOS - BLQ-FT-01-F1", "LOSA-L1" → "LOSAS - LOS-L1"...) y las
+    /// de 1.0.3 con la categoría del anfitrión en vez de la fija del prefijo ("LOSAS - CCO-12" → "CIMIENTOS - CCO-12"),
+    /// rellena "ARBA - Origen" (y "ARBA - Código" si la partición lo contenía) y deja "Metrado - Elemento" igual a la
+    /// categoría de la partición (la fija del prefijo o la del anfitrión real, ver ArbaPartition.CategoryFor).
+    /// Asegura antes los parámetros del contrato. Dentro de una transacción.
     /// </summary>
     internal static class ArbaMigration
     {
@@ -134,8 +136,12 @@ namespace Arba.Comun
                 Element host = null;
                 try { host = doc.GetElement(ArbaPartition.RebarHostId(rebar)); } catch (Exception) { }
                 string category;
-                if (host != null) category = ArbaPartition.CategoryOf(host);
-                else { category = info.Category.Length > 0 ? info.Category : ArbaContract.CatOtros; r.SinAnfitrion++; }
+                if (host != null) category = ArbaPartition.CategoryFor(host, info.PrefixInfo);
+                else
+                {
+                    category = ArbaPartition.CategoryFor(info.PrefixInfo, info.Category);
+                    if (string.IsNullOrWhiteSpace(info.PrefixInfo?.Category)) r.SinAnfitrion++;
+                }
 
                 bool changed = false;
                 try
@@ -156,9 +162,12 @@ namespace Arba.Comun
                             changed = true;
                         }
                     }
-                    else if (ArbaSharedParams.GetText(rebar, ArbaContract.Elemento).Trim().Length == 0)
+                    else if (!string.Equals(ArbaSharedParams.GetText(rebar, ArbaContract.Elemento).Trim(), category, StringComparison.Ordinal)
+                             && ArbaSharedParams.SetText(rebar, ArbaContract.Elemento, category))
                     {
-                        ArbaSharedParams.SetText(rebar, ArbaContract.Elemento, category);
+                        // 1.0.3 escribía la categoría del anfitrión (LOSAS en un cimiento dibujado como suelo).
+                        r.ElementoCorregido++;
+                        changed = true;
                     }
                 }
                 catch (Exception ex)

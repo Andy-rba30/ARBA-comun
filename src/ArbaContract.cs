@@ -47,10 +47,16 @@ namespace Arba.Comun
         public readonly string[] Codes;
         /// <summary>Qué usa {marca} si el anfitrión no tiene Marca: el Id (add-ins de armado) o el nombre del tipo (MAN).</summary>
         public readonly ArbaMarkFallback MarkFallback;
+        /// <summary>
+        /// Categoría fija de la partición y de "Metrado - Elemento" (desde 1.0.4): el add-in sabe qué arma aunque el
+        /// anfitrión esté modelado como otra cosa (una zapata o un cimiento corrido dibujados como suelo siguen siendo
+        /// CIMIENTOS). Null = la categoría del anfitrión (MCO: pantalla MUROS y zapata CIMIENTOS; MAN: lo que haya).
+        /// </summary>
+        public readonly string Category;
 
-        public ArbaPrefix(string prefix, string origin, string repo, string[] legacy, string[] codes, ArbaMarkFallback markFallback = ArbaMarkFallback.Id)
+        public ArbaPrefix(string prefix, string origin, string repo, string[] legacy, string[] codes, ArbaMarkFallback markFallback = ArbaMarkFallback.Id, string category = null)
         {
-            Prefix = prefix; Origin = origin; Repo = repo; Legacy = legacy; Codes = codes; MarkFallback = markFallback;
+            Prefix = prefix; Origin = origin; Repo = repo; Legacy = legacy; Codes = codes; MarkFallback = markFallback; Category = category;
         }
 
         public override string ToString() => Prefix + " (" + Origin + ")";
@@ -72,7 +78,7 @@ namespace Arba.Comun
     /// </summary>
     internal static class ArbaContract
     {
-        public const string Version = "1.0.3";
+        public const string Version = "1.0.4";
 
         // ---------------------------------------------------------------- cinta
         public const string TabName = "ARBA";
@@ -133,14 +139,14 @@ namespace Arba.Comun
 
         public static readonly ArbaPrefix[] Prefijos =
         {
-            new ArbaPrefix("ZAP", "ZAPATAS",             "Acero-Zapatas",            new[] { "ZAP" },  new[] { "inferior", "inferior-sec", "superior", "superior-sec" }),
-            new ArbaPrefix("CCO", "CIMIENTOS CORRIDOS",  "Acero-cimientos-corridos", new[] { "CC" },   new[] { "superior", "inferior", "estribo" }),
-            new ArbaPrefix("BLQ", "BLOQUES",             "Fosa_transformadores",     new[] { "BLQ" },  new[] { "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8" }),
-            new ArbaPrefix("VIG", "VIGAS",               "Acero-vigas",              new[] { "VIG" },  new[] { "superior", "inferior", "estribo" }),
-            new ArbaPrefix("COL", "COLUMNAS",            "Acero-columnas",           new[] { "COL" },  new string[0]),
-            new ArbaPrefix("LOS", "LOSAS",               "Acero-losas",              new[] { "LOSA" }, new[] { "inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura" }),
-            new ArbaPrefix("MCO", "MUROS DE CONTENCION", "Acero-automatico",         new[] { "MC" },   new string[0]),
-            new ArbaPrefix("MUR", "MUROS",               "(reservado: futuro add-in de placas / muros estructurales)", new string[0], new string[0]),
+            new ArbaPrefix("ZAP", "ZAPATAS",             "Acero-Zapatas",            new[] { "ZAP" },  new[] { "inferior", "inferior-sec", "superior", "superior-sec" }, ArbaMarkFallback.Id, CatCimientos),
+            new ArbaPrefix("CCO", "CIMIENTOS CORRIDOS",  "Acero-cimientos-corridos", new[] { "CC" },   new[] { "superior", "inferior", "estribo" }, ArbaMarkFallback.Id, CatCimientos),
+            new ArbaPrefix("BLQ", "BLOQUES",             "Fosa_transformadores",     new[] { "BLQ" },  new[] { "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8" }, ArbaMarkFallback.Id, CatCimientos),
+            new ArbaPrefix("VIG", "VIGAS",               "Acero-vigas",              new[] { "VIG" },  new[] { "superior", "inferior", "estribo" }, ArbaMarkFallback.Id, CatVigas),
+            new ArbaPrefix("COL", "COLUMNAS",            "Acero-columnas",           new[] { "COL" },  new string[0], ArbaMarkFallback.Id, CatColumnas),
+            new ArbaPrefix("LOS", "LOSAS",               "Acero-losas",              new[] { "LOSA" }, new[] { "inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura" }, ArbaMarkFallback.Id, CatLosas),
+            new ArbaPrefix("MCO", "MUROS DE CONTENCION", "Acero-automatico",         new[] { "MC" },   new string[0]),   // pantalla → MUROS, zapata → CIMIENTOS: la del anfitrión
+            new ArbaPrefix("MUR", "MUROS",               "(reservado: futuro add-in de placas / muros estructurales)", new string[0], new string[0], ArbaMarkFallback.Id, CatMuros),
             new ArbaPrefix("MAN", "MANUAL",              "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", new string[0], new string[0], ArbaMarkFallback.TypeName),
         };
 

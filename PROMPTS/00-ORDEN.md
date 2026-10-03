@@ -13,6 +13,7 @@ que la sesión se detenga para que pruebes en Revit antes de fusionar):
 | 6 | `06-Acero-columnas.md` | Acero-columnas | Mecánico |
 | 7 | `07-Acero-losas.md` | Acero-losas | Mecánico, con tests |
 | 8 | `08-Acero-automatico.md` | Acero-automatico (muros de contención) | El más distinto |
+| 9 | `09-Exportacion-metrados-excel-1.0.4.md` | Exportacion-metrados-excel | Contrato 1.0.4 (categoría fija por prefijo): el plugin debe respetar la categoría que declara la partición al rellenar `Metrado - Elemento`. Los otros siete repos solo actualizan el submódulo |
 
 Antes de pegar cada prompt comprueba que el repo está en la rama que dice su cabecera (o en `main` si ya fusionaste
 algo) y que `ARBA-comun` tiene la etiqueta `v1.0.0`.

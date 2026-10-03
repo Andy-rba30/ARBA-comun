@@ -2,7 +2,7 @@
 
 Código fuente común y **contrato** compartido por todos los add-ins de Revit ARBA (armado de zapatas, cimientos
 corridos, bloques con foso, vigas, columnas, losas y muros de contención, y el plugin de metrados). Versión del
-contrato: **1.0.3** (etiqueta `v1.0.3`).
+contrato: **1.0.4** (etiqueta `v1.0.4`).
 
 | Documento | Qué contiene |
 |---|---|
@@ -42,10 +42,10 @@ Compila en `net48` (Revit 2021-2024), `net8.0-windows` (2025-2026) y `net10.0-wi
 |---|---|
 | `ArbaContract` | El contrato en constantes: versión, parámetros (`ArbaParam`: nombre, GUID, tipo, categorías), categorías y prefijos de partición (`ArbaPrefix`), nombres de la cinta, valores de texto |
 | `ArbaSharedParams` | Asegura las definiciones compartidas y sus vínculos (archivo temporal, `SharedParametersFilename` restaurado en `finally`), migra parámetros homónimos antiguos conservando valores, y lee/escribe por GUID |
-| `ArbaPartition` (+ `.Revit`) | Construye (`BuildFor(host, prefijo, código)`) y lee (`Parse`) particiones del contrato con tolerancia a las antiguas; categoría del anfitrión; escritura correcta del parámetro Partición (predefinido, con respaldo por nombre en español e inglés); reglas de filtro "empieza por" |
+| `ArbaPartition` (+ `.Revit`) | Construye (`BuildFor(host, prefijo, código)`) y lee (`Parse`) particiones del contrato con tolerancia a las antiguas; categoría fija del prefijo o, si no la fija, del anfitrión (`CategoryFor`, desde 1.0.4); escritura correcta del parámetro Partición (predefinido, con respaldo por nombre en español e inglés); reglas de filtro "empieza por" |
 | `PartitionName` | Expansión de la plantilla de partición, unificando las siete copias (`{categoria}`, `{prefijo}`, `{marca}`, `{id}`, `{codigo}` y alias `{capa}`/`{cara}`/`{estribo}`/`{ala}`, `{tipo}`, `{familia}`, `{conjunto}`) |
 | `ArbaOrigin` | Escribe y lee `ARBA - Origen` / `Código` / `Anfitrión`; `Find` y `Delete` de lo que creó un add-in en un anfitrión ("borrar y rearmar" sin Comentarios) |
-| `ArbaMetrado` | Partida, material, peso, pernos y grupo MISCELANEOS en los elementos con peso propio; `PesoProtegido` para el plugin de metrados |
+| `ArbaMetrado` | Partida, material, peso, pernos y grupo MISCELANEOS en los elementos con peso propio; `PesoProtegido` y `ElementoFor` (grupo de metrado que declara la partición, desde 1.0.4) para el plugin de metrados |
 | `ArbaMigration` / `ArbaMigrateCommandBase` | Migración de modelos existentes sin rearmar: particiones antiguas → nuevas, origen, código y `Metrado - Elemento`; comando base para el botón "Migrar particiones y origen" |
 | `ArbaRibbon` | Pestaña `ARBA`, paneles `IA` / `Acero` / `Metrados` / `Encofrado` en orden, desplegable `Acero`, botones sueltos del panel `Metrados`, iconos vectoriales comunes |
 | `RevitTheme` | Tema oscuro WPF estilo Revit 2027 (idéntico en seis add-ins) |

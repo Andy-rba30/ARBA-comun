@@ -53,7 +53,8 @@ namespace Arba.Comun
                     MainInstruction = todo ? "Migrar todo el modelo al contrato ARBA " + ArbaContract.Version
                                            : "Migrar la selección (" + seleccion.Count + " elemento(s)) al contrato ARBA " + ArbaContract.Version,
                     MainContent = "Convierte las particiones antiguas (ZAP-…, CC-…, BLQ-…, VIG-…, COL-…, LOSA-…, MC-…) a la forma " +
-                                  "\"CATEGORIA - PREFIJO-marca\", rellena \"ARBA - Origen\", \"ARBA - Código\" y \"Metrado - Elemento\" y crea los " +
+                                  "\"CATEGORIA - PREFIJO-marca\", corrige la categoría de las que la tomaron del anfitrión (LOSAS - CCO-… → " +
+                                  "CIMIENTOS - CCO-…), rellena \"ARBA - Origen\", \"ARBA - Código\" y \"Metrado - Elemento\" y crea los " +
                                   "parámetros compartidos del contrato si faltan. No crea ni borra ninguna barra. Se puede deshacer con Ctrl+Z.",
                     CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No,
                     DefaultButton = TaskDialogResult.Yes,

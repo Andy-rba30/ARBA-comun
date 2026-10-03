@@ -48,8 +48,8 @@ namespace Arba.Comun
     internal static partial class ArbaPartition
     {
         /// <summary>
-        /// Partición del contrato. <paramref name="category"/> es la del anfitrión (ver CategoryOf);
-        /// <paramref name="mark"/> vacía usa <paramref name="id"/>; <paramref name="code"/> es opcional.
+        /// Partición del contrato. <paramref name="category"/> es la fija del prefijo o, si no tiene, la del anfitrión
+        /// (ver CategoryFor); <paramref name="mark"/> vacía usa <paramref name="id"/>; <paramref name="code"/> es opcional.
         /// Con <paramref name="template"/> nula se usa la plantilla por defecto del contrato.
         /// </summary>
         public static string Build(string category, string prefix, string mark, string id, string code = null, string template = null)
@@ -83,6 +83,31 @@ namespace Arba.Comun
             if (!string.IsNullOrWhiteSpace(mark)) return mark.Trim();
             if (prefix != null && prefix.MarkFallback == ArbaMarkFallback.TypeName) return (typeName ?? "").Trim();
             return (id ?? "").Trim();
+        }
+
+        /// <summary>
+        /// Categoría de la partición (y de "Metrado - Elemento") de lo que crea un add-in: la fija del prefijo
+        /// (ZAP, CCO y BLQ → CIMIENTOS aunque el anfitrión sea un suelo; VIG, COL, LOS, MUR → la suya) y, si el
+        /// prefijo no la fija (MCO, MAN, nulo), la del anfitrión; OTROS si tampoco hay.
+        /// </summary>
+        public static string CategoryFor(ArbaPrefix prefix, string hostCategory)
+        {
+            if (prefix != null && !string.IsNullOrWhiteSpace(prefix.Category)) return Normalize(prefix.Category);
+            string h = Normalize(hostCategory);
+            return h.Length > 0 ? h : ArbaContract.CatOtros;
+        }
+
+        /// <summary>
+        /// Categoría que declara una partición ya escrita, para que "Metrado - Elemento" la respete: la fija del
+        /// prefijo si lo tiene (así "LOSAS - CCO-12" sigue siendo CIMIENTOS), si no la categoría del texto
+        /// ("MUROS - MCO-M1", "CIMIENTOS"); "" si la partición no declara ninguna (antigua "MC-M1", texto libre).
+        /// </summary>
+        public static string DeclaredCategory(ArbaPartitionInfo info)
+        {
+            if (info == null) return "";
+            if (info.IsArba && info.PrefixInfo != null && !string.IsNullOrWhiteSpace(info.PrefixInfo.Category)) return Normalize(info.PrefixInfo.Category);
+            if (info.IsArba || info.Kind == ArbaPartitionKind.CategoryOnly) return Normalize(info.Category);
+            return "";
         }
 
         /// <summary>Texto de categoría normalizado (mayúsculas, sin espacios sobrantes); "" si es nulo.</summary>

@@ -148,6 +148,9 @@ namespace Arba.Comun.Tests
                 Check(SameSet(Strings(jp.GetProperty("codigos")), p.Codes), pre + ".codigos (" + p.Codes.Length + ")");
                 string marcaVacia = jp.TryGetProperty("marcaVacia", out JsonElement mv) ? mv.GetString() : "id";
                 Check((marcaVacia == "tipo") == (p.MarkFallback == ArbaMarkFallback.TypeName), pre + ".marcaVacia = " + marcaVacia);
+                Check(jp.TryGetProperty("categoria", out JsonElement jc), pre + ".categoria presente en el JSON");
+                string categoria = jc.ValueKind == JsonValueKind.String ? jc.GetString() : null;
+                Eq(categoria ?? "(anfitrión)", p.Category ?? "(anfitrión)", pre + ".categoria");
             }
             var alias = part.GetProperty("alias").EnumerateObject().ToList();
             foreach (JsonProperty a in alias)
@@ -207,6 +210,33 @@ namespace Arba.Comun.Tests
             Eq(ArbaPartition.CategoryForBuiltIn("OST_Columns"), "COLUMNAS", "OST_Columns → COLUMNAS");
             Eq(ArbaPartition.CategoryForBuiltIn("OST_GenericModel"), "OTROS", "categoría fuera de la tabla → OTROS");
             Eq(ArbaPartition.CategoryForBuiltIn(""), "OTROS", "sin categoría → OTROS");
+
+            // 1.0.4: categoría fija del prefijo (el add-in sabe qué arma aunque el anfitrión sea un suelo)
+            Check(ArbaContract.Prefijos.All(p => p.Category == null || ArbaPartition.IsCategory(p.Category)), "las categorías fijas son categorías del contrato");
+            Check(new[] { ArbaContract.Zapatas, ArbaContract.CimientosCorridos, ArbaContract.Bloques }.All(p => p.Category == "CIMIENTOS"), "ZAP, CCO y BLQ fijan CIMIENTOS");
+            Eq(ArbaContract.Vigas.Category, "VIGAS", "VIG fija VIGAS"); Eq(ArbaContract.Columnas.Category, "COLUMNAS", "COL fija COLUMNAS");
+            Eq(ArbaContract.Losas.Category, "LOSAS", "LOS fija LOSAS"); Eq(ArbaContract.Muros.Category, "MUROS", "MUR fija MUROS");
+            Check(ArbaContract.MurosContencion.Category == null && ArbaContract.Manual.Category == null, "MCO y MAN siguen al anfitrión");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.CimientosCorridos, "LOSAS"), "CIMIENTOS", "cimiento corrido en un suelo → CIMIENTOS");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.Zapatas, "LOSAS"), "CIMIENTOS", "zapata en un suelo → CIMIENTOS");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.MurosContencion, "LOSAS"), "LOSAS", "MCO: la del anfitrión");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.MurosContencion, "muros"), "MUROS", "MCO: la del anfitrión, normalizada");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.Manual, ""), "OTROS", "MAN sin anfitrión → OTROS");
+            Eq(ArbaPartition.CategoryFor(null, "vigas"), "VIGAS", "sin prefijo: la del anfitrión");
+            Eq(ArbaPartition.CategoryFor(ArbaContract.Bloques, ""), "CIMIENTOS", "BLQ sin anfitrión: la fija");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("LOSAS - CCO-476232")), "CIMIENTOS", "partición 1.0.3 de un cimiento en suelo declara CIMIENTOS");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("ZAP-Z1")), "CIMIENTOS", "antigua ZAP-Z1 declara CIMIENTOS");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("MUROS - MCO-M1")), "MUROS", "MCO declara lo que dice el texto");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("MC-M1")), "", "antigua MC-M1 no declara nada");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("CIMIENTOS")), "CIMIENTOS", "solo categoría declara su categoría");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("LOSAS - MAN-Losa 20")), "LOSAS", "MAN declara lo que dice el texto");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("Muro de contención")), "", "texto libre no declara nada");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("")), "", "vacía no declara nada");
+            Eq(ArbaPartition.DeclaredCategory(null), "", "nula no declara nada");
+            ArbaPartitionInfo cco = ArbaPartition.Parse("LOSAS - CCO-476232");
+            Eq(ArbaPartition.Upgrade(cco, ArbaPartition.CategoryFor(cco.PrefixInfo, "LOSAS")), "CIMIENTOS - CCO-476232", "la migración corrige la categoría de 1.0.3");
+            ArbaPartitionInfo mco = ArbaPartition.Parse("CIMIENTOS - MCO-M-1");
+            Eq(ArbaPartition.Upgrade(mco, ArbaPartition.CategoryFor(mco.PrefixInfo, "CIMIENTOS")), "CIMIENTOS - MCO-M-1", "la zapata del muro de contención sigue en CIMIENTOS");
         }
 
         private static void Parse()

@@ -9,6 +9,12 @@ namespace Arba.Comun
         /// <summary>CATEGORIA del contrato para un anfitrión: por su BuiltInCategory (OTROS si no está en la tabla o es nulo).</summary>
         public static string CategoryOf(Element host) => CategoryForBuiltIn(ArbaRevit.BuiltInNameOf(host));
 
+        /// <summary>
+        /// Categoría de lo que el add-in <paramref name="prefix"/> crea en <paramref name="host"/>: la fija del prefijo
+        /// (CIMIENTOS para ZAP, CCO y BLQ aunque el anfitrión sea un suelo) o, si no la fija, la del anfitrión.
+        /// </summary>
+        public static string CategoryFor(Element host, ArbaPrefix prefix) => CategoryFor(prefix, host != null ? CategoryOf(host) : "");
+
         /// <summary>Marca (ALL_MODEL_MARK) del anfitrión; "" si no tiene.</summary>
         public static string MarkOf(Element host)
         {
@@ -33,16 +39,17 @@ namespace Arba.Comun
 
         /// <summary>
         /// Partición del contrato de un elemento creado en <paramref name="host"/> por el add-in <paramref name="prefix"/>.
-        /// Sin Marca, los add-ins de armado usan el Id y MAN el nombre del tipo (ver ArbaPrefix.MarkFallback).
+        /// La categoría es la fija del prefijo o la del anfitrión (ver CategoryFor). Sin Marca, los add-ins de armado
+        /// usan el Id y MAN el nombre del tipo (ver ArbaPrefix.MarkFallback).
         /// </summary>
         public static string BuildFor(Element host, ArbaPrefix prefix, string code = null, string template = null)
-            => Build(CategoryOf(host), prefix?.Prefix, EffectiveMark(prefix, MarkOf(host), IdTextOf(host), TypeNameOf(host)), "", code, template);
+            => Build(CategoryFor(host, prefix), prefix?.Prefix, EffectiveMark(prefix, MarkOf(host), IdTextOf(host), TypeNameOf(host)), "", code, template);
 
         /// <summary>Partición con plantilla personalizada: rellena categoría, prefijo, marca e id del anfitrión; el resto viene en <paramref name="source"/>.</summary>
         public static string BuildFor(Element host, ArbaPrefix prefix, string template, PartitionName.Source source)
         {
             if (source == null) source = new PartitionName.Source();
-            source.Category = CategoryOf(host);
+            source.Category = CategoryFor(host, prefix);
             source.Prefix = prefix?.Prefix ?? "";
             if (string.IsNullOrWhiteSpace(source.Mark)) source.Mark = MarkOf(host);
             if (string.IsNullOrWhiteSpace(source.Id)) source.Id = IdTextOf(host);

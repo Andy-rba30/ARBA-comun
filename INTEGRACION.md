@@ -62,7 +62,9 @@ común: `..\external\ARBA-comun\src\ArbaContract.cs`, `ArbaPartition.cs`, `Parti
   `"{categoria} - {prefijo}-{marca}-{codigo}"`).
 - `HostAnalysis.Partition(cfg, …)` → `ArbaPartition.BuildFor(Host, ArbaContract.<Prefijo>, cfg.PartitionTemplate,
   new PartitionName.Source { Mark = Mark, Id = …, TypeName = TypeName, FamilyName = FamilyName, SetName = setName,
-  Code = <capa/cara/estribo/ala/familia> })`. La categoría la deduce del anfitrión; el prefijo lo pone el add-in.
+  Code = <capa/cara/estribo/ala/familia> })`. El prefijo lo pone el add-in; la categoría es la fija del prefijo
+  (desde 1.0.4: `CIMIENTOS` para Zapatas, Cimientos y Bloques aunque el anfitrión sea un suelo) o, si el prefijo no la
+  fija (muros de contención), la del anfitrión (`ArbaPartition.CategoryFor`).
 - En la ventana, si `!ArbaPartition.TemplateFollowsContract(cfg.PartitionTemplate)` muestra un aviso (la plantilla
   tiene que empezar por `{categoria} - {prefijo}-`) y enseña `ArbaContract.Version` en el pie o el informe.
 - `PartitionName.Help` común describe los comodines nuevos.
@@ -96,10 +98,13 @@ separado con `ArbaOrigin.Delete(..., kind: ArbaOriginKind.Rebar)` / `ArbaOriginK
 Lo aporta **Exportacion-metrados-excel** (botón `ARBA_Metrados_Migrar`, clase pública `MigrarParticionesCommand :
 IExternalCommand` con `[Transaction(TransactionMode.Manual)]` que delega en una subclase privada de
 `ArbaMigrateCommandBase`, porque el código común es `internal` y una clase pública no puede heredar de él): sin
-selección migra todo el modelo; con selección, los anfitriones elegidos. Convierte `ZAP-Z1` → `CIMIENTOS - ZAP-Z1`, `CC-C1` → `MUROS - CCO-C1` (categoría del anfitrión real),
-`BLQ-FT-01-F1` → `CIMIENTOS - BLQ-FT-01-F1`, `LOSA-L1` → `LOSAS - LOS-L1`, `MC-M1` → `…- MCO-M1`; rellena
-`ARBA - Origen`, `ARBA - Código` (si la partición lo llevaba) y `Metrado - Elemento`; no toca las particiones de solo
-categoría ni las desconocidas; no crea ni borra barras; Ctrl+Z lo deshace. Los add-ins de armado no duplican el botón
+selección migra todo el modelo; con selección, los anfitriones elegidos. Convierte `ZAP-Z1` → `CIMIENTOS - ZAP-Z1`, `CC-C1` → `CIMIENTOS - CCO-C1`,
+`BLQ-FT-01-F1` → `CIMIENTOS - BLQ-FT-01-F1`, `LOSA-L1` → `LOSAS - LOS-L1`, `MC-M1` → `…- MCO-M1` (categoría del
+anfitrión real: pantalla o zapata) y, desde 1.0.4, `LOSAS - CCO-12` → `CIMIENTOS - CCO-12` (categoría fija del prefijo);
+rellena `ARBA - Origen`, `ARBA - Código` (si la partición lo llevaba) y deja `Metrado - Elemento` igual a la categoría
+de la partición; no toca las particiones de solo categoría ni las desconocidas; no crea ni borra barras; Ctrl+Z lo
+deshace. Después de migrar conviene pasar "Metrado automático": es quien rellena `Metrado - Elemento` en el acero
+manual y en las particiones de solo categoría (`CIMIENTOS` a mano en barras de un suelo → Cimentaciones). Los add-ins de armado no duplican el botón
 (usan `MigrateHost` al armar, paso 6). Si un add-in quiere su propio botón: subclase de `ArbaMigrateCommandBase`
 con `OnlyPrefix => ArbaContract.<Prefijo>` y `ArbaRibbon.AddAcero`.
 
@@ -143,13 +148,13 @@ comandos y una recompilación, sin tocar su código:
 
 ```powershell
 git -C external/ARBA-comun fetch --tags origin
-git -C external/ARBA-comun checkout v1.0.2
-git add external/ARBA-comun && git commit -m "Submodulo ARBA-comun v1.0.2" && git push
+git -C external/ARBA-comun checkout v1.0.4
+git add external/ARBA-comun && git commit -m "Submodulo ARBA-comun v1.0.4" && git push
 ```
 
 Solo un cambio **MAJOR** del contrato (`CONTRATO.md` §4) obliga a editar código en los add-ins; MINOR y PATCH no.
 
-Para hacerlo en los ocho a la vez: `tools/actualizar-arba-comun.ps1 -Version v1.0.2 -Repos <carpetas> [-Build]`
+Para hacerlo en los ocho a la vez: `tools/actualizar-arba-comun.ps1 -Version v1.0.4 -Repos <carpetas> [-Build]`
 (salta los repos con cambios sin confirmar y resume el resultado en una tabla). Para no tener que acordarse,
 `tools/dependabot-submodulo.yml` copiado como `.github/dependabot.yml` en cada add-in hace que GitHub abra un pull
 request en ese repo cada vez que avance `main` de ARBA-comun.
@@ -158,3 +163,18 @@ Cuando los ocho estén integrados y probados, la opción más cómoda a largo pl
 con una carpeta por add-in, el común como carpeta normal y una sola solución): un commit cambia todo, una compilación
 prueba todo y una sesión de Claude Code ve todo. Migrar es mecánico (`git subtree add` por repo conserva el
 historial), pero conviene no hacerlo a mitad de la integración.
+
+## 11. Qué cambia con 1.0.4 (categoría fija por prefijo) y qué hay que tocar
+
+Motivo: las cimentaciones se suelen modelar como suelos, así que con 1.0.0–1.0.3 un cimiento corrido o una zapata
+armados en un suelo salían `LOSAS - CCO-…` / `LOSAS - ZAP-…` y la tabla "Metrado acero - Cimentaciones" quedaba vacía.
+Desde 1.0.4 la categoría la fija el prefijo (`CONTRATO.md` §2) y `Metrado - Elemento` respeta la categoría que declara
+la partición.
+
+| Repo | Qué hacer | Por qué |
+|---|---|---|
+| Los siete add-ins de armado | Solo actualizar el submódulo a `v1.0.4` y recompilar (`tools/actualizar-arba-comun.ps1 -Version v1.0.4 -Build`) | Todos construyen la partición con `ArbaPartition.BuildFor` y escriben el origen con `ArbaOrigin.WriteFor`, que ya aplican la categoría fija. Fosa_transformadores muestra `ArbaPartition.CategoryOf(item.Host)` en un texto informativo del informe; es cosmético y puede cambiarse a `CategoryFor(item.Host, ArbaContract.Bloques)` cuando se toque ese repo |
+| Exportacion-metrados-excel | `PROMPTS/09-Exportacion-metrados-excel-1.0.4.md`: una línea en `ClasificadorElementos.RellenarElementoRefuerzo` (usar `ArbaMetrado.ElementoFor`) + submódulo | "Metrado automático" sobrescribe siempre `Metrado - Elemento` con la categoría del anfitrión; sin este cambio volvería a poner `LOSAS` en el acero de un cimiento modelado como suelo |
+
+En los modelos ya armados con 1.0.3: botón **Migrar particiones y origen** (corrige `LOSAS - CCO-…` →
+`CIMIENTOS - CCO-…` y el elemento) y después **Metrado automático**. No hace falta rearmar.
