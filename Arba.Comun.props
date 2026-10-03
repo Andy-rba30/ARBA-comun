@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ARBA-comun: código fuente común de los add-ins ARBA, consumido SIEMPRE como fuente (nunca como DLL compartida:
+  Revit carga todos los add-ins a la vez y dos versiones de una misma DLL chocarían).
+
+  Uso en cada add-in (submódulo git en external/ARBA-comun):
+      <Import Project="external/ARBA-comun/Arba.Comun.props" />
+  Opcional, antes del Import:
+      <RevitVersion>2027</RevitVersion>     define REVIT2027 (necesario para la compilación condicional de la API)
+      <ArbaComunDir>...</ArbaComunDir>      si el submódulo está en otra ruta
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <ArbaComunDir Condition="'$(ArbaComunDir)' == ''">$(MSBuildThisFileDirectory)</ArbaComunDir>
+    <ArbaComunVersion>1.0.0</ArbaComunVersion>
+
+    <!-- Versión de Revit: se infiere del TargetFramework cuando el add-in no la declara.
+         net10.0-windows -> 2027; net8.0-windows -> 2026 (misma API que 2025 para este código); net48 -> 2024.
+         Para Revit 2021 (ParameterType en vez de SpecTypeId) hay que declarar <RevitVersion>2021</RevitVersion>. -->
+    <RevitVersion Condition="'$(RevitVersion)' == '' AND '$(TargetFramework)' == 'net10.0-windows'">2027</RevitVersion>
+    <RevitVersion Condition="'$(RevitVersion)' == '' AND '$(TargetFramework)' == 'net8.0-windows'">2026</RevitVersion>
+    <RevitVersion Condition="'$(RevitVersion)' == '' AND '$(TargetFramework)' == 'net48'">2024</RevitVersion>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2027</RevitVersion>
+
+    <DefineConstants>$(DefineConstants);REVIT$(RevitVersion);ARBA_COMUN</DefineConstants>
+    <DefineConstants Condition="$(RevitVersion) &lt;= 2022">$(DefineConstants);REVIT_2022_OR_OLDER</DefineConstants>
+    <DefineConstants Condition="$(RevitVersion) &gt;= 2024">$(DefineConstants);REVIT_2024_OR_NEWER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(ArbaComunDir)src/**/*.cs" Link="Arba.Comun/%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="$(ArbaComunDir)contrato.json" Link="Arba.Comun/contrato.json" />
+  </ItemGroup>
+
+</Project>

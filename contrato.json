@@ -1,0 +1,179 @@
+{
+  "contrato": "ARBA-comun",
+  "version": "1.0.0",
+  "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
+
+  "conjuntosCategorias": {
+    "refuerzo": ["OST_Rebar", "OST_FabricReinforcement"],
+    "miscelaneos": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener", "OST_Roofs"],
+    "anfitriones": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_StructuralFoundation", "OST_Floors", "OST_Walls", "OST_StructuralStiffener", "OST_StructConnections", "OST_GenericModel", "OST_Roofs"]
+  },
+
+  "grupoParametros": "Datos (PG_DATA / GroupTypeId.Data)",
+  "grupoArchivoCompartido": "ARBA",
+
+  "parametros": [
+    {
+      "clave": "Origen",
+      "nombre": "ARBA - Origen",
+      "guid": "778D89FB-06FB-4455-B0CB-9F3CE40655F3",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_Rebar", "OST_FabricReinforcement", "OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener", "OST_Roofs"],
+      "valores": ["ZAPATAS", "CIMIENTOS CORRIDOS", "BLOQUES", "VIGAS", "COLUMNAS", "LOSAS", "MUROS DE CONTENCION", "MUROS", "MANUAL"],
+      "escribe": ["cada add-in de armado al crear un elemento (RebarGenerator.Finish / GridGenerator)", "ArbaMigration (modelos antiguos)", "Exportacion-metrados-excel: MANUAL en 'Asignar partición'"],
+      "lee": ["cada add-in para encontrar, borrar y rearmar lo suyo (ArbaOrigin.Find)", "Exportacion-metrados-excel: no sobrescribe el peso ni la partición de lo que tiene origen"],
+      "descripcion": "Add-in que creó el elemento (valor de la tabla de prefijos)."
+    },
+    {
+      "clave": "Codigo",
+      "nombre": "ARBA - Código",
+      "guid": "AADB7B24-22B1-4D5B-8F24-E2E4468C16B3",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_Rebar", "OST_FabricReinforcement", "OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener", "OST_Roofs"],
+      "valores": ["F1 … F8 (bloques)", "inferior / inferior-sec / superior / superior-sec (zapatas, losas)", "baston / temperatura (losas)", "superior / inferior / estribo (vigas, cimientos)", "REJILLA P1 / ANGULO longCore (misceláneos de bloques)"],
+      "escribe": ["cada add-in de armado al crear", "ArbaMigration cuando la partición antigua lo contiene"],
+      "lee": ["cada add-in (borrar solo una familia, informes)", "Exportacion-metrados-excel (columna informativa)"],
+      "descripcion": "Familia o capa propia del add-in dentro del elemento anfitrión."
+    },
+    {
+      "clave": "Anfitrion",
+      "nombre": "ARBA - Anfitrión",
+      "guid": "F5CE04ED-FD80-4C5E-88EF-1EA46162E8C9",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener", "OST_Roofs"],
+      "valores": ["Id del elemento anfitrión como texto, p. ej. 123456"],
+      "escribe": ["los add-ins que crean elementos que NO son armaduras (rejillas y ángulos de Fosa_transformadores)"],
+      "lee": ["ArbaOrigin.Find / Delete para 'borrar y rearmar' sin Comentarios"],
+      "descripcion": "Anfitrión de un elemento creado que no es armadura (las armaduras ya saben su anfitrión por la API). Añadido respecto a la lista inicial: sin él no se puede sustituir la marca 'host <id>' de Comentarios."
+    },
+    {
+      "clave": "Partida",
+      "nombre": "Metrado - Partida",
+      "guid": "379229AB-6C40-4CFC-81B7-10DF6468B842",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener", "OST_Roofs"],
+      "valores": ["ESTRUCTURAS METÁLICAS - REJILLAS", "ESTRUCTURAS METÁLICAS - ÁNGULOS", "texto libre en mayúsculas"],
+      "escribe": ["Fosa_transformadores en rejillas y ángulos", "el usuario a mano en otros misceláneos"],
+      "lee": ["Exportacion-metrados-excel: tabla 'Metrado acero estructural - Misceláneos' agrupada por esta partida"],
+      "descripcion": "Agrupación de misceláneos para el metrado."
+    },
+    {
+      "clave": "Material",
+      "nombre": "Metrado - Material",
+      "guid": "5B7E3C1A-2D4F-4A6B-9C8D-0E1F2A3B4C5D",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_StructuralFoundation", "OST_Floors", "OST_Walls", "OST_StructuralStiffener", "OST_StructConnections", "OST_GenericModel", "OST_Roofs"],
+      "valores": ["CONCRETO", "ACERO ESTRUCTURAL", "MADERA", "OTRO"],
+      "escribe": ["Exportacion-metrados-excel (clasificación automática en cada metrado)", "Fosa_transformadores: ACERO ESTRUCTURAL en rejillas y ángulos"],
+      "lee": ["Exportacion-metrados-excel: filtros de tablas y de vista, resumen"],
+      "descripcion": "Clasificación del material para separar concreto de metálico. GUID conservado del plugin de metrados actual: los modelos ya metrados no necesitan migración."
+    },
+    {
+      "clave": "Peso",
+      "nombre": "Metrado - Peso (kg)",
+      "guid": "7D2A9F4E-6B1C-4C3D-8E5F-1A2B3C4D5E6F",
+      "tipo": "numero",
+      "ejemplar": true,
+      "categorias": ["OST_Rebar", "OST_FabricReinforcement", "OST_StructuralFraming", "OST_StructuralColumns", "OST_StructuralStiffener", "OST_StructConnections", "OST_GenericModel", "OST_Roofs"],
+      "valores": ["kg, 3 decimales"],
+      "escribe": ["Exportacion-metrados-excel (armaduras, perfiles y piezas sin peso propio)", "Fosa_transformadores en rejillas (m² × kg/m²) y ángulos (m × kg/m)"],
+      "lee": ["Exportacion-metrados-excel: columnas y totales de las tablas, Excel"],
+      "descripcion": "Peso en kg. El plugin de metrados NO sobrescribe un valor > 0 en un elemento con 'ARBA - Origen' no vacío. GUID conservado del plugin actual."
+    },
+    {
+      "clave": "Pernos",
+      "nombre": "Metrado - Pernos (und)",
+      "guid": "E63C6327-2A69-469F-A237-947AF6BF6AB7",
+      "tipo": "entero",
+      "ejemplar": true,
+      "categorias": ["OST_StructuralFraming", "OST_StructuralColumns", "OST_GenericModel", "OST_StructConnections", "OST_StructuralStiffener"],
+      "valores": ["unidades enteras"],
+      "escribe": ["Fosa_transformadores en cada ángulo (boltsPerAngle)"],
+      "lee": ["Exportacion-metrados-excel: suma por partida en la tabla de misceláneos y en el Excel"],
+      "descripcion": "Pernos de anclaje o expansión asociados al elemento."
+    },
+    {
+      "clave": "Elemento",
+      "nombre": "Metrado - Elemento",
+      "guid": "9A4C7E21-3B5D-4F8A-A6C2-2D3E4F5A6B7C",
+      "tipo": "texto",
+      "ejemplar": true,
+      "categorias": ["OST_Rebar", "OST_FabricReinforcement", "OST_StructuralFraming", "OST_StructuralColumns", "OST_StructuralFoundation", "OST_Floors", "OST_Walls", "OST_StructuralStiffener", "OST_StructConnections", "OST_GenericModel", "OST_Roofs"],
+      "valores": ["VIGAS", "COLUMNAS", "CIMIENTOS", "LOSAS", "MUROS", "CONEXIONES", "OTROS"],
+      "escribe": ["Exportacion-metrados-excel (siempre, en cada metrado: grupo del elemento o del anfitrión del refuerzo)", "cada add-in de armado al crear, con la CATEGORIA de la partición (prerrelleno)"],
+      "lee": ["Exportacion-metrados-excel: filtro de las tablas por elemento y de los filtros de vista"],
+      "descripcion": "Grupo de metrado. Ya existía en el plugin con este GUID; se incorpora al contrato porque es el filtro real de las tablas de acero y sus valores coinciden con la CATEGORIA de la partición."
+    }
+  ],
+
+  "particion": {
+    "plantilla": "{categoria} - {prefijo}-{marca}-{codigo}",
+    "separadorCategoria": " - ",
+    "separador": "-",
+    "codigoOpcional": true,
+    "marcaVaciaUsaId": true,
+    "categoriaPorDefecto": "OTROS",
+    "categorias": {
+      "CIMIENTOS": ["OST_StructuralFoundation"],
+      "VIGAS": ["OST_StructuralFraming"],
+      "COLUMNAS": ["OST_StructuralColumns", "OST_Columns"],
+      "LOSAS": ["OST_Floors"],
+      "MUROS": ["OST_Walls"]
+    },
+    "prefijos": [
+      { "prefijo": "ZAP", "origen": "ZAPATAS",             "repo": "Acero-Zapatas",            "antiguos": ["ZAP"],  "codigos": ["inferior", "inferior-sec", "superior", "superior-sec"], "plantillaAntigua": "ZAP-{marca}" },
+      { "prefijo": "CCO", "origen": "CIMIENTOS CORRIDOS",  "repo": "Acero-cimientos-corridos", "antiguos": ["CC"],   "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "CC-{marca}" },
+      { "prefijo": "BLQ", "origen": "BLOQUES",             "repo": "Fosa_transformadores",     "antiguos": ["BLQ"],  "codigos": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8"], "plantillaAntigua": "BLQ-{marca}-{familia}" },
+      { "prefijo": "VIG", "origen": "VIGAS",               "repo": "Acero-vigas",              "antiguos": ["VIG"],  "codigos": ["superior", "inferior", "estribo"], "plantillaAntigua": "VIG-{marca}" },
+      { "prefijo": "COL", "origen": "COLUMNAS",            "repo": "Acero-columnas",           "antiguos": ["COL"],  "codigos": [], "plantillaAntigua": "COL-{marca}" },
+      { "prefijo": "LOS", "origen": "LOSAS",               "repo": "Acero-losas",              "antiguos": ["LOSA"], "codigos": ["inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura"], "plantillaAntigua": "LOSA-{marca}" },
+      { "prefijo": "MCO", "origen": "MUROS DE CONTENCION", "repo": "Acero-automatico",         "antiguos": ["MC"],   "codigos": [], "plantillaAntigua": "MC-{marca}" },
+      { "prefijo": "MUR", "origen": "MUROS",               "repo": "(reservado: futuro add-in de placas / muros estructurales)", "antiguos": [], "codigos": [], "plantillaAntigua": "" },
+      { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "" }
+    ],
+    "comodines": ["{categoria}", "{prefijo}", "{marca}", "{id}", "{codigo}", "{tipo}", "{familia}", "{conjunto}", "{capa}", "{cara}", "{estribo}", "{ala}", "{familiarevit}"],
+    "alias": { "{capa}": "{codigo}", "{cara}": "{codigo}", "{estribo}": "{codigo}", "{ala}": "{codigo}", "{familiarevit}": "{familia}" }
+  },
+
+  "cinta": {
+    "pestana": "ARBA",
+    "paneles": ["IA", "Acero", "Metrados", "Encofrado"],
+    "desplegables": [ { "nombre": "Acero", "panel": "Acero", "texto": "Acero" } ],
+    "botones": [
+      { "nombre": "ARBA_Acero_Zapatas",      "texto": "Zapatas",                     "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-Zapatas" },
+      { "nombre": "ARBA_Acero_Cimientos",    "texto": "Cimientos/\nSobrecimientos",  "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-cimientos-corridos" },
+      { "nombre": "ARBA_Acero_Bloques",      "texto": "Bloques con foso",            "panel": "Acero",    "desplegable": "Acero", "repo": "Fosa_transformadores" },
+      { "nombre": "ARBA_Acero_Vigas",        "texto": "Vigas",                       "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-vigas" },
+      { "nombre": "ARBA_Acero_Columnas",     "texto": "Columnas",                    "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-columnas" },
+      { "nombre": "ARBA_Acero_Losas",        "texto": "Losas",                       "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-losas" },
+      { "nombre": "ARBA_Acero_Muro",         "texto": "Muro de contencion",          "panel": "Acero",    "desplegable": "Acero", "repo": "Acero-automatico" },
+      { "nombre": "ARBA_Metrados_Exportar",  "texto": "Exportar a\nExcel",           "panel": "Metrados", "desplegable": "",      "repo": "Exportacion-metrados-excel" },
+      { "nombre": "ARBA_Metrados_Automatico","texto": "Metrado\nautomático",         "panel": "Metrados", "desplegable": "",      "repo": "Exportacion-metrados-excel" },
+      { "nombre": "ARBA_Metrados_Particion", "texto": "Asignar\npartición",          "panel": "Metrados", "desplegable": "",      "repo": "Exportacion-metrados-excel" },
+      { "nombre": "ARBA_Metrados_Migrar",    "texto": "Migrar\nparticiones y origen","panel": "Metrados", "desplegable": "",      "repo": "Exportacion-metrados-excel" }
+    ]
+  },
+
+  "compatibilidad": {
+    "esquema": "semver sobre 'version'. Cada add-in declara en su cinta/informe la versión del contrato con la que compiló (ArbaContract.Version).",
+    "rompe": [
+      "cambiar el GUID, el nombre, el tipo de dato o el carácter ejemplar/tipo de un parámetro existente",
+      "quitar un parámetro, una categoría de partición, un prefijo o un valor de ARBA - Origen",
+      "cambiar la gramática de la partición (separadores, orden de los campos) o el significado de un comodín",
+      "renombrar la pestaña, un panel, el desplegable o el nombre interno de un botón existente"
+    ],
+    "noRompe": [
+      "añadir un parámetro nuevo (con GUID nuevo), un prefijo nuevo, un valor nuevo de origen, una categoría nueva de vinculación",
+      "añadir un botón o un panel nuevo",
+      "añadir comodines o alias nuevos a la plantilla de partición",
+      "cambiar descripciones, iconos, textos de botón y documentación (PATCH)"
+    ],
+    "parametrosAntiguos": "Un parámetro de proyecto homónimo (no compartido o con otro GUID) se migra en ArbaSharedParams.Ensure: se crea el compartido del contrato, se copian los valores de todos los ejemplares y se quita el vínculo antiguo, avisando. Los parámetros del plugin de metrados en main (mismo GUID) no necesitan migración.",
+    "particionesAntiguas": "ArbaPartition.Parse reconoce 'ZAP-…', 'CC-…', 'BLQ-…-F1', 'VIG-…', 'COL-…', 'LOSA-…', 'MC-…' (prefijo antiguo, sin categoría) y las particiones de solo categoría ('VIGAS') del plugin de metrados. El botón 'Migrar particiones y origen' (ArbaMigration.MigrateAll) las convierte a la forma nueva y rellena ARBA - Origen / Código / Metrado - Elemento sin rearmar. Mientras no se migren, el plugin de metrados las sigue metrando (filtra por Metrado - Elemento, no por la partición)."
+  }
+}

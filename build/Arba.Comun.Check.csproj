@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Comprobación de compilación del código común contra cada versión de Revit, sin Revit instalado:
+      dotnet build build/Arba.Comun.Check.csproj -c Release -p:RevitVersion=2021   (2021..2027)
+    o bien  build/check-all.sh  /  build/check-all.ps1  para las siete.
+    No produce nada que se use: el código común se consume como fuente (Arba.Comun.props) en cada add-in.
+  -->
+
+  <PropertyGroup>
+    <RevitVersion Condition="'$(RevitVersion)' == ''">2027</RevitVersion>
+    <TargetFramework Condition="$(RevitVersion) &lt; 2025">net48</TargetFramework>
+    <TargetFramework Condition="$(RevitVersion) &gt;= 2025 AND $(RevitVersion) &lt; 2027">net8.0-windows</TargetFramework>
+    <TargetFramework Condition="$(RevitVersion) &gt;= 2027">net10.0-windows</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <AssemblyName>Arba.Comun.Check</AssemblyName>
+    <RootNamespace>Arba.Comun</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors>CS0618;CS0612</WarningsNotAsErrors>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <IntermediateOutputPath>obj/$(RevitVersion)/</IntermediateOutputPath>
+    <OutputPath>bin/$(RevitVersion)/</OutputPath>
+    <DefaultItemExcludes>$(DefaultItemExcludes);obj/**;bin/**</DefaultItemExcludes>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" ExcludeAssets="runtime" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- El mismo .props que importan los add-ins -->
+  <Import Project="../Arba.Comun.props" />
+
+  <ItemGroup>
+    <Compile Include="CheckUsage.cs" />
+  </ItemGroup>
+
+</Project>
