@@ -1,4 +1,4 @@
-# Contrato ARBA-comun — versión 1.0.1
+# Contrato ARBA-comun — versión 1.0.2
 
 Este documento describe lo que todos los add-ins ARBA comparten. La fuente de verdad legible por máquina es
 `contrato.json`; el código la refleja en `src/ArbaContract.cs` y los tests de `tests/` comprueban que los tres
@@ -51,7 +51,9 @@ Decisiones:
   armado por Acero-cimientos-corridos pero modelado como muro queda en `MUROS - CCO-…` (es como ya lo agrupa el
   metrado); el prefijo conserva quién lo armó.
 - **Separador de categoría**: ` - ` (espacio, guion, espacio). **Separador de campos**: `-`.
-- **{marca}**: parámetro Marca del anfitrión; si está vacía, su Id.
+- **{marca}**: parámetro Marca del anfitrión; si está vacía, su Id. Excepción: con el prefijo `MAN` (acero no
+  creado por ARBA) una marca vacía usa el **nombre del tipo** del anfitrión (`CIMIENTOS - MAN-Z1_1.5x1.5m`), que
+  agrupa los elementos iguales en las tablas; si tampoco hay tipo, queda `CIMIENTOS - MAN` (desde 1.0.2).
 - **{código}** es **opcional**: cada add-in decide qué unidad de agrupación le interesa en las tablas. Por defecto
   solo Bloques lo incluye (`F1`…`F8`, como hoy); Zapatas, Cimientos, Vigas, Columnas, Losas y Muros lo dejan vacío
   (una partición por elemento, como hoy) y el detalle queda en `ARBA - Código`. Un comodín vacío desaparece con su
@@ -75,7 +77,8 @@ Prefijos (tres letras, uno por add-in; el prefijo identifica **quién armó**, l
 | `MAN` | `MANUAL` | Exportacion-metrados-excel ("Asignar partición" en armaduras sin origen ARBA) | — | permite que el acero manual siga la misma gramática (`VIGAS - MAN-V1`) |
 
 Ejemplos: `CIMIENTOS - ZAP-Z1`, `CIMIENTOS - BLQ-FT-01-F4`, `VIGAS - VIG-V-101`, `COLUMNAS - COL-C3`,
-`LOSAS - LOS-L2`, `MUROS - MCO-MC1`, `CIMIENTOS - CCO-1234` (sin marca, con Id), `VIGAS - MAN-V7`.
+`LOSAS - LOS-L2`, `MUROS - MCO-MC1`, `CIMIENTOS - CCO-1234` (sin marca, con Id), `VIGAS - MAN-V7`,
+`CIMIENTOS - MAN-Z1_1.5x1.5m` (manual sin marca: nombre del tipo).
 
 Lectura tolerante (`ArbaPartition.Parse`): reconoce la forma del contrato, las particiones **antiguas** sin
 categoría (`ZAP-Z1`, `CC-C1`, `BLQ-FT-01-F1`, `VIG-V1`, `COL-C1`, `LOSA-L1`, `MC-M1`), las de **solo categoría**

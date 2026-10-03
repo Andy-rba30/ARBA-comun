@@ -146,6 +146,8 @@ namespace Arba.Comun.Tests
                 Eq(jp.GetProperty("origen").GetString(), p.Origin, pre + ".origen");
                 Check(SameSet(Strings(jp.GetProperty("antiguos")), p.Legacy), pre + ".antiguos = [" + string.Join(", ", p.Legacy) + "]");
                 Check(SameSet(Strings(jp.GetProperty("codigos")), p.Codes), pre + ".codigos (" + p.Codes.Length + ")");
+                string marcaVacia = jp.TryGetProperty("marcaVacia", out JsonElement mv) ? mv.GetString() : "id";
+                Check((marcaVacia == "tipo") == (p.MarkFallback == ArbaMarkFallback.TypeName), pre + ".marcaVacia = " + marcaVacia);
             }
             var alias = part.GetProperty("alias").EnumerateObject().ToList();
             foreach (JsonProperty a in alias)
@@ -190,6 +192,14 @@ namespace Arba.Comun.Tests
             Eq(ArbaPartition.Build("VIGAS", "VIG", "V1", "1", "sup", "{categoria} - {prefijo}-{marca}-{codigo}-{conjunto}"), "VIGAS - VIG-V1-sup", "comodín vacío al final");
             Eq(ArbaPartition.Build("{categoria} - {prefijo}-{marca}-{codigo} ({tipo})", new PartitionName.Source
                 { Category = "columnas", Prefix = "col", Mark = "C3", Id = "1", Code = "", TypeName = "30x60" }), "COLUMNAS - COL-C3 (30x60)", "plantilla personalizada con tipo");
+            Eq(ArbaPartition.EffectiveMark(ArbaContract.Zapatas, "Z1", "100", "Z1_1.5x1.5m"), "Z1", "marca efectiva: la marca manda");
+            Eq(ArbaPartition.EffectiveMark(ArbaContract.Zapatas, "", "100", "Z1_1.5x1.5m"), "100", "ZAP sin marca usa el Id");
+            Eq(ArbaPartition.EffectiveMark(ArbaContract.Manual, "", "100", "Z1_1.5x1.5m"), "Z1_1.5x1.5m", "MAN sin marca usa el nombre del tipo");
+            Eq(ArbaPartition.EffectiveMark(ArbaContract.Manual, "", "100", ""), "", "MAN sin marca ni tipo: nada");
+            Eq(ArbaPartition.Build("CIMIENTOS", "MAN", ArbaPartition.EffectiveMark(ArbaContract.Manual, "", "100", ""), ""), "CIMIENTOS - MAN", "partición MAN sin marca ni tipo");
+            Eq(ArbaPartition.Build("CIMIENTOS", "MAN", "Zapata - 1.5", ""), "CIMIENTOS - MAN-Zapata - 1.5", "nombre de tipo con ' - ' se conserva");
+            Check(ArbaPartition.Parse("CIMIENTOS - MAN-Zapata - 1.5").Mark == "Zapata - 1.5", "y se lee como marca entera");
+            Check(ArbaContract.Prefijos.All(x => x == ArbaContract.Manual ? x.MarkFallback == ArbaMarkFallback.TypeName : x.MarkFallback == ArbaMarkFallback.Id), "solo MAN usa el tipo como respaldo de la marca");
             Eq(ArbaPartition.FilterPrefix("vigas"), "VIGAS - ", "FilterPrefix(categoría)");
             Eq(ArbaPartition.FilterPrefix("Vigas", "vig"), "VIGAS - VIG-", "FilterPrefix(categoría, prefijo)");
             Eq(ArbaPartition.CategoryForBuiltIn("OST_Floors"), "LOSAS", "OST_Floors → LOSAS");

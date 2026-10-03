@@ -25,6 +25,15 @@ namespace Arba.Comun
         public override string ToString() => Name;
     }
 
+    /// <summary>Qué usa {marca} cuando el anfitrión no tiene Marca.</summary>
+    internal enum ArbaMarkFallback
+    {
+        /// <summary>El Id del anfitrión (una partición por elemento).</summary>
+        Id,
+        /// <summary>El nombre del tipo del anfitrión (agrupa los elementos iguales); si tampoco hay, nada.</summary>
+        TypeName,
+    }
+
     /// <summary>Prefijo de partición de un add-in: a quién pertenece, qué prefijos antiguos sustituye y qué códigos usa.</summary>
     internal sealed class ArbaPrefix
     {
@@ -36,10 +45,12 @@ namespace Arba.Comun
         public readonly string[] Legacy;
         /// <summary>Códigos (capas / familias) conocidos del add-in: sirven para separar marca y código al leer una partición.</summary>
         public readonly string[] Codes;
+        /// <summary>Qué usa {marca} si el anfitrión no tiene Marca: el Id (add-ins de armado) o el nombre del tipo (MAN).</summary>
+        public readonly ArbaMarkFallback MarkFallback;
 
-        public ArbaPrefix(string prefix, string origin, string repo, string[] legacy, string[] codes)
+        public ArbaPrefix(string prefix, string origin, string repo, string[] legacy, string[] codes, ArbaMarkFallback markFallback = ArbaMarkFallback.Id)
         {
-            Prefix = prefix; Origin = origin; Repo = repo; Legacy = legacy; Codes = codes;
+            Prefix = prefix; Origin = origin; Repo = repo; Legacy = legacy; Codes = codes; MarkFallback = markFallback;
         }
 
         public override string ToString() => Prefix + " (" + Origin + ")";
@@ -61,7 +72,7 @@ namespace Arba.Comun
     /// </summary>
     internal static class ArbaContract
     {
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         // ---------------------------------------------------------------- cinta
         public const string TabName = "ARBA";
@@ -130,7 +141,7 @@ namespace Arba.Comun
             new ArbaPrefix("LOS", "LOSAS",               "Acero-losas",              new[] { "LOSA" }, new[] { "inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura" }),
             new ArbaPrefix("MCO", "MUROS DE CONTENCION", "Acero-automatico",         new[] { "MC" },   new string[0]),
             new ArbaPrefix("MUR", "MUROS",               "(reservado: futuro add-in de placas / muros estructurales)", new string[0], new string[0]),
-            new ArbaPrefix("MAN", "MANUAL",              "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", new string[0], new string[0]),
+            new ArbaPrefix("MAN", "MANUAL",              "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", new string[0], new string[0], ArbaMarkFallback.TypeName),
         };
 
         public static ArbaPrefix Zapatas => Prefijos[0];

@@ -74,6 +74,17 @@ namespace Arba.Comun
             return PartitionName.Expand(string.IsNullOrWhiteSpace(template) ? ArbaContract.PartitionTemplate : template, source);
         }
 
+        /// <summary>
+        /// Marca efectiva de una partición: la Marca del anfitrión; si está vacía, lo que pida el prefijo
+        /// (Id para los add-ins de armado; nombre del tipo para MAN, y si tampoco hay, nada).
+        /// </summary>
+        public static string EffectiveMark(ArbaPrefix prefix, string mark, string id, string typeName)
+        {
+            if (!string.IsNullOrWhiteSpace(mark)) return mark.Trim();
+            if (prefix != null && prefix.MarkFallback == ArbaMarkFallback.TypeName) return (typeName ?? "").Trim();
+            return (id ?? "").Trim();
+        }
+
         /// <summary>Texto de categoría normalizado (mayúsculas, sin espacios sobrantes); "" si es nulo.</summary>
         public static string Normalize(string category) => (category ?? "").Trim().ToUpperInvariant();
 

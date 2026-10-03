@@ -1,6 +1,6 @@
 {
   "contrato": "ARBA-comun",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
 
   "conjuntosCategorias": {
@@ -117,6 +117,7 @@
     "separador": "-",
     "codigoOpcional": true,
     "marcaVaciaUsaId": true,
+    "marcaVaciaMAN": "tipo",
     "categoriaPorDefecto": "OTROS",
     "categorias": {
       "CIMIENTOS": ["OST_StructuralFoundation"],
@@ -134,7 +135,7 @@
       { "prefijo": "LOS", "origen": "LOSAS",               "repo": "Acero-losas",              "antiguos": ["LOSA"], "codigos": ["inferior", "inferior-sec", "superior", "superior-sec", "baston", "temperatura"], "plantillaAntigua": "LOSA-{marca}" },
       { "prefijo": "MCO", "origen": "MUROS DE CONTENCION", "repo": "Acero-automatico",         "antiguos": ["MC"],   "codigos": [], "plantillaAntigua": "MC-{marca}" },
       { "prefijo": "MUR", "origen": "MUROS",               "repo": "(reservado: futuro add-in de placas / muros estructurales)", "antiguos": [], "codigos": [], "plantillaAntigua": "" },
-      { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "" }
+      { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "", "marcaVacia": "tipo" }
     ],
     "comodines": ["{categoria}", "{prefijo}", "{marca}", "{id}", "{codigo}", "{tipo}", "{familia}", "{conjunto}", "{capa}", "{cara}", "{estribo}", "{ala}", "{familiarevit}"],
     "alias": { "{capa}": "{codigo}", "{cara}": "{codigo}", "{estribo}": "{codigo}", "{ala}": "{codigo}", "{familiarevit}": "{familia}" }

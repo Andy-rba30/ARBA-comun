@@ -19,9 +19,24 @@ namespace Arba.Comun
         /// <summary>Id del anfitrión como texto (lo que usa {id} cuando la marca está vacía).</summary>
         public static string IdTextOf(Element host) => host == null ? "" : ArbaRevit.IdValue(host.Id).ToString();
 
-        /// <summary>Partición del contrato de un elemento creado en <paramref name="host"/> por el add-in <paramref name="prefix"/>.</summary>
+        /// <summary>Nombre del tipo del anfitrión ("" si no tiene).</summary>
+        public static string TypeNameOf(Element host)
+        {
+            try
+            {
+                if (host == null) return "";
+                Element type = host.Document.GetElement(host.GetTypeId());
+                return type?.Name?.Trim() ?? "";
+            }
+            catch (Exception) { return ""; }
+        }
+
+        /// <summary>
+        /// Partición del contrato de un elemento creado en <paramref name="host"/> por el add-in <paramref name="prefix"/>.
+        /// Sin Marca, los add-ins de armado usan el Id y MAN el nombre del tipo (ver ArbaPrefix.MarkFallback).
+        /// </summary>
         public static string BuildFor(Element host, ArbaPrefix prefix, string code = null, string template = null)
-            => Build(CategoryOf(host), prefix?.Prefix, MarkOf(host), IdTextOf(host), code, template);
+            => Build(CategoryOf(host), prefix?.Prefix, EffectiveMark(prefix, MarkOf(host), IdTextOf(host), TypeNameOf(host)), "", code, template);
 
         /// <summary>Partición con plantilla personalizada: rellena categoría, prefijo, marca e id del anfitrión; el resto viene en <paramref name="source"/>.</summary>
         public static string BuildFor(Element host, ArbaPrefix prefix, string template, PartitionName.Source source)
@@ -31,6 +46,7 @@ namespace Arba.Comun
             source.Prefix = prefix?.Prefix ?? "";
             if (string.IsNullOrWhiteSpace(source.Mark)) source.Mark = MarkOf(host);
             if (string.IsNullOrWhiteSpace(source.Id)) source.Id = IdTextOf(host);
+            source.Mark = EffectiveMark(prefix, source.Mark, source.Id, TypeNameOf(host));
             return Build(template, source);
         }
 
