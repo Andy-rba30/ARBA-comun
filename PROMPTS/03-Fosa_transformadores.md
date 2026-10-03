@@ -1,7 +1,6 @@
 # Prompt: integrar ARBA-comun en Fosa_transformadores (BlockRebar)
 
-Estás en el repo **Fosa_transformadores** (rama `claude/ecstatic-ptolemy-cehcro`, commit a9691a0 o posterior; no hay
-`main`). Vas a integrar el código común **ARBA-comun** (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`)
+Estás en el repo **Fosa_transformadores** (rama `main`, commit a9691a0 o posterior). Vas a integrar el código común **ARBA-comun** (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`)
 siguiendo `external/ARBA-comun/INTEGRACION.md` y `CONTRATO.md`. Trabaja en la rama `claude/integrar-arba-comun`. No
 modifiques nada dentro de `external/ARBA-comun`; lo que falte va a `NOTAS-ARBA-COMUN.md`.
 

@@ -1,7 +1,6 @@
 # Prompt: integrar ARBA-comun en Acero-vigas (BeamRebar)
 
-Estás en el repo **Acero-vigas** (rama `claude/intelligent-lovelace-nlqbfb`, commit 4d66a34 o posterior; no hay `main`
-y la rama por defecto de GitHub, `claude/affectionate-allen-1kin91`, es más antigua). Vas a integrar el código común
+Estás en el repo **Acero-vigas** (rama `main`, commit 4d66a34 o posterior). Vas a integrar el código común
 **ARBA-comun** (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`) siguiendo `external/ARBA-comun/INTEGRACION.md`
 y `CONTRATO.md`. Trabaja en `claude/integrar-arba-comun`. No modifiques nada dentro de `external/ARBA-comun`.
 

@@ -1,6 +1,6 @@
 # Prompt: integrar ARBA-comun en Acero-Zapatas
 
-Estás en el repo **Acero-Zapatas** (rama `claude/pensive-rubin-nsa1u1`, commit a9e4039 o posterior; no hay `main`).
+Estás en el repo **Acero-Zapatas** (rama `main`, commit a9e4039 o posterior).
 Vas a integrar el código común **ARBA-comun** (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`) siguiendo
 `external/ARBA-comun/INTEGRACION.md` y `CONTRATO.md` (léelos tras añadir el submódulo). Trabaja en la rama
 `claude/integrar-arba-comun`. No modifiques nada dentro de `external/ARBA-comun`; lo que falte va a `NOTAS-ARBA-COMUN.md`.

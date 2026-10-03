@@ -1,7 +1,6 @@
 # Prompt: integrar ARBA-comun en Acero-losas (SlabRebar)
 
-Estás en el repo **Acero-losas** (rama `main`, commit f4eca62 o posterior; la rama por defecto de GitHub,
-`claude/brave-allen-3gowqo`, es más antigua). Vas a integrar el código común **ARBA-comun**
+Estás en el repo **Acero-losas** (rama `main`, commit f4eca62 o posterior). Vas a integrar el código común **ARBA-comun**
 (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`) siguiendo `external/ARBA-comun/INTEGRACION.md` y
 `CONTRATO.md`. Trabaja en `claude/integrar-arba-comun`. No modifiques nada dentro de `external/ARBA-comun`.
 

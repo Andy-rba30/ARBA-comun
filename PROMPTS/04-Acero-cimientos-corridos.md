@@ -1,8 +1,7 @@
 # Prompt: integrar ARBA-comun en Acero-cimientos-corridos (StripFootingRebar)
 
-Estás en el repo **Acero-cimientos-corridos** (rama `main`, commit 11052c0 o posterior; ojo: la rama por defecto en
-GitHub es `claude/affectionate-allen-1kin91`, más antigua; `PENDIENTE.md` dice que `main` no se ha compilado ni probado:
-compílala primero y, si falla, arregla la compilación antes de seguir). Vas a integrar el código común **ARBA-comun**
+Estás en el repo **Acero-cimientos-corridos** (rama `main`, commit 11052c0 o posterior; `PENDIENTE.md` dice que `main` no se ha
+compilado ni probado: compílala primero y, si falla, arregla la compilación antes de seguir). Vas a integrar el código común **ARBA-comun**
 (https://github.com/Andy-rba30/ARBA-comun, etiqueta `v1.0.0`) siguiendo `external/ARBA-comun/INTEGRACION.md` y
 `CONTRATO.md`. Trabaja en `claude/integrar-arba-comun`. No modifiques nada dentro de `external/ARBA-comun`.
 
