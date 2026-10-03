@@ -11,7 +11,7 @@ Regla de rama: `main` cuando existe; si no, la rama `claude/*` con el commit má
 | Acero-Zapatas | `claude/pensive-rubin-nsa1u1` (a9e4039, 2026-10-02) | la misma | **No hay `main`.** Un solo commit |
 | Acero-cimientos-corridos | `main` (11052c0, 2026-10-02) | `claude/affectionate-allen-1kin91` | `main` integra las ramas de empalmes, suelos/muros y columnas unidas (ver `PENDIENTE.md`: no probado en Revit) |
 | Fosa_transformadores | `claude/ecstatic-ptolemy-cehcro` (a9691a0, 2026-10-03) | la misma | **No hay `main`.** 15 commits |
-| Acero-automatico | `main` (5ead63f, 2026-09-29) | `main` | Es el add-in de **muros de contención** (`RetainingWallRebar`), no un "acero automático" genérico |
+| Acero-automatico | `main` (5ead63f, 2026-09-29; el 2026-10-03 se fusionó el tema oscuro: 84611a7) | `main` | Es el add-in de **muros de contención** (`RetainingWallRebar`), no un "acero automático" genérico |
 | Exportacion-metrados-excel | `main` (477acaf, 2026-10-03) | `claude/wizardly-thompson-jw4ffy` | `main` es la más nueva (20 commits) |
 
 ## 1. Versiones de Revit y TargetFramework
@@ -196,3 +196,10 @@ ningún add-in usa `IA` ni `Encofrado`. Manifiestos: los 7 add-ins usan `ClientI
 17. **Acero-cimientos-corridos** acepta muros, suelos y vigas como anfitrión: con la regla "categoría = la del
     anfitrión" un sobrecimiento modelado como muro irá a `MUROS` (como ya hace hoy el plugin de metrados), no a
     `CIMIENTOS`. El prefijo `CCO` conserva la trazabilidad del add-in.
+
+## 8. Actualización posterior (2026-10-03)
+
+Tras el inventario se normalizaron las ramas: los ocho repos tienen `main` como rama por defecto (creada en
+Acero-vigas, Acero-Zapatas y Fosa_transformadores desde su rama `claude/*` más reciente) y en Acero-automatico se
+fusionó `claude/sweet-hypatia-t3n7nf` (tema oscuro, `RevitTheme.cs` idéntico al común). Los prompts de `PROMPTS/`
+parten de `main` en todos los casos.
