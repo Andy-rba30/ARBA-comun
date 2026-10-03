@@ -1,4 +1,4 @@
-# Contrato ARBA-comun — versión 1.0.2
+# Contrato ARBA-comun — versión 1.0.3
 
 Este documento describe lo que todos los add-ins ARBA comparten. La fuente de verdad legible por máquina es
 `contrato.json`; el código la refleja en `src/ArbaContract.cs` y los tests de `tests/` comprueban que los tres

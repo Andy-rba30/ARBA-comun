@@ -1,6 +1,6 @@
 {
   "contrato": "ARBA-comun",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
 
   "conjuntosCategorias": {
@@ -138,7 +138,8 @@
       { "prefijo": "MAN", "origen": "MANUAL",              "repo": "Exportacion-metrados-excel ('Asignar partición' en acero no creado por ARBA)", "antiguos": [], "codigos": [], "plantillaAntigua": "", "marcaVacia": "tipo" }
     ],
     "comodines": ["{categoria}", "{prefijo}", "{marca}", "{id}", "{codigo}", "{tipo}", "{familia}", "{conjunto}", "{capa}", "{cara}", "{estribo}", "{ala}", "{familiarevit}"],
-    "alias": { "{capa}": "{codigo}", "{cara}": "{codigo}", "{estribo}": "{codigo}", "{ala}": "{codigo}", "{familiarevit}": "{familia}" }
+    "alias": { "{capa}": "{codigo}", "{cara}": "{codigo}", "{estribo}": "{codigo}", "{ala}": "{codigo}", "{familiarevit}": "{familia}" },
+    "notaCapa": "Desde 1.0.3, {capa} usa la subcapa propia (PartitionName.Source.Layer: u / v en Bloques) si el add-in la rellena; si no, vale {codigo}."
   },
 
   "cinta": {

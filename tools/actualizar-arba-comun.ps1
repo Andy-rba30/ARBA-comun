@@ -9,13 +9,14 @@
 .NOTES
   - Cada repo debe estar limpio (git status) y en la rama que se quiere actualizar; si no, se salta y se avisa.
   - No fusiona ni cambia de rama. Con -NoPush solo confirma en local.
-  - Con -Build compila (Release; -p:RevitVersion para proyectos multi-versión). Revit debe estar cerrado
-    si la compilación copia a la carpeta de add-ins.
+  - Con -Build compila (-Configuration Release por defecto; los add-ins de armado solo copian a Revit en Debug,
+    el plugin de metrados en cualquiera; -p:RevitVersion para proyectos multi-versión). Revit debe estar cerrado.
 #>
 param(
     [Parameter(Mandatory = $true)] [string] $Version,
     [Parameter(Mandatory = $true)] [string[]] $Repos,
     [switch] $Build,
+    [string] $Configuration = "Release",   # los add-ins de armado copian a Revit solo en Debug: usa -Configuration Debug
     [string] $RevitVersion = "2027",
     [switch] $NoPush
 )
@@ -51,7 +52,7 @@ foreach ($repo in $Repos) {
         if ($Build) {
             $csproj = Get-ChildItem -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '\\(external|Tests|build)\\' } | Select-Object -First 1
             if ($csproj) {
-                $args = @('build', $csproj.FullName, '-c', 'Release', '-nologo', '-v', 'q')
+                $args = @('build', $csproj.FullName, '-c', $Configuration, '-nologo', '-v', 'q')
                 if ((Get-Content $csproj.FullName -Raw) -match 'RevitVersion') { $args += "-p:RevitVersion=$RevitVersion" }
                 $salida = & dotnet @args 2>&1
                 $fila.Estado += if ($LASTEXITCODE -eq 0) { '; compila' } else { '; ERROR al compilar: ' + (($salida | Select-String 'error' | Select-Object -First 3) -join ' | ') }

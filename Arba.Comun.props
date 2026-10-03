@@ -13,7 +13,7 @@
 
   <PropertyGroup>
     <ArbaComunDir Condition="'$(ArbaComunDir)' == ''">$(MSBuildThisFileDirectory)</ArbaComunDir>
-    <ArbaComunVersion>1.0.2</ArbaComunVersion>
+    <ArbaComunVersion>1.0.3</ArbaComunVersion>
 
     <!-- Versión de Revit: se infiere del TargetFramework cuando el add-in no la declara.
          net10.0-windows -> 2027; net8.0-windows -> 2026 (misma API que 2025 para este código); net48 -> 2024.
@@ -22,6 +22,11 @@
     <RevitVersion Condition="'$(RevitVersion)' == '' AND '$(TargetFramework)' == 'net8.0-windows'">2026</RevitVersion>
     <RevitVersion Condition="'$(RevitVersion)' == '' AND '$(TargetFramework)' == 'net48'">2024</RevitVersion>
     <RevitVersion Condition="'$(RevitVersion)' == ''">2027</RevitVersion>
+
+    <!-- El glob por defecto del SDK (**/*.cs) ya recoge el submódulo cuando está dentro del proyecto: sin esto los
+         .cs de src/ entrarían dos veces (CS2002) y además tests/ y build/ del común. Ruta relativa al proyecto. -->
+    <_ArbaComunRelativo>$([MSBuild]::MakeRelative($(MSBuildProjectDirectory), $(ArbaComunDir)))</_ArbaComunRelativo>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(_ArbaComunRelativo)**</DefaultItemExcludes>
 
     <DefineConstants>$(DefineConstants);REVIT$(RevitVersion);ARBA_COMUN</DefineConstants>
     <DefineConstants Condition="$(RevitVersion) &lt;= 2022">$(DefineConstants);REVIT_2022_OR_OLDER</DefineConstants>

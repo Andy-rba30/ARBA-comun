@@ -12,6 +12,17 @@ namespace Arba.Comun
     /// API; los demás elementos creados (rejillas, ángulos) lo llevan en "ARBA - Anfitrión".
     /// Los parámetros deben existir en el proyecto (ArbaSharedParams.Ensure) antes de escribir.
     /// </summary>
+    /// <summary>Qué elementos de un add-in se buscan o borran.</summary>
+    internal enum ArbaOriginKind
+    {
+        /// <summary>Todo lo que creó el add-in.</summary>
+        All,
+        /// <summary>Solo armaduras (Rebar, RebarInSystem, FabricSheet).</summary>
+        Rebar,
+        /// <summary>Solo lo que no es armadura (rejillas, ángulos...).</summary>
+        NotRebar,
+    }
+
     internal static class ArbaOrigin
     {
         /// <summary>
@@ -61,10 +72,10 @@ namespace Arba.Comun
         }
 
         /// <summary>Elementos creados por el add-in del prefijo, opcionalmente solo los de un anfitrión y/o un código.</summary>
-        public static List<Element> Find(Document doc, ArbaPrefix prefix, Element host = null, string code = null)
-            => Find(doc, prefix?.Origin, host?.Id, code);
+        public static List<Element> Find(Document doc, ArbaPrefix prefix, Element host = null, string code = null, ArbaOriginKind kind = ArbaOriginKind.All)
+            => Find(doc, prefix?.Origin, host?.Id, code, kind);
 
-        public static List<Element> Find(Document doc, string origin, ElementId hostId = null, string code = null)
+        public static List<Element> Find(Document doc, string origin, ElementId hostId = null, string code = null, ArbaOriginKind kind = ArbaOriginKind.All)
         {
             var result = new List<Element>();
             if (doc == null || string.IsNullOrWhiteSpace(origin)) return result;
@@ -94,6 +105,8 @@ namespace Arba.Comun
                 if (!string.Equals(OriginOf(e), wanted, StringComparison.OrdinalIgnoreCase)) continue;
                 if (hostId != null && hostId != ElementId.InvalidElementId && HostIdOf(e) != hostId) continue;
                 if (!string.IsNullOrWhiteSpace(code) && !string.Equals(CodeOf(e), code.Trim(), StringComparison.OrdinalIgnoreCase)) continue;
+                if (kind == ArbaOriginKind.Rebar && !ArbaPartition.IsRebar(e)) continue;
+                if (kind == ArbaOriginKind.NotRebar && ArbaPartition.IsRebar(e)) continue;
                 result.Add(e);
             }
             return result;
@@ -103,11 +116,11 @@ namespace Arba.Comun
         /// Borra lo que el add-in creó en el anfitrión (o en todo el modelo si es nulo). Dentro de una transacción.
         /// Devuelve el número de elementos borrados; <paramref name="barPositions"/> suma las barras de los conjuntos.
         /// </summary>
-        public static int Delete(Document doc, ArbaPrefix prefix, Element host, out int barPositions, string code = null)
+        public static int Delete(Document doc, ArbaPrefix prefix, Element host, out int barPositions, string code = null, ArbaOriginKind kind = ArbaOriginKind.All)
         {
             barPositions = 0;
             int n = 0;
-            foreach (Element e in Find(doc, prefix, host, code))
+            foreach (Element e in Find(doc, prefix, host, code, kind))
             {
                 try
                 {
@@ -120,6 +133,7 @@ namespace Arba.Comun
             return n;
         }
 
-        public static int Delete(Document doc, ArbaPrefix prefix, Element host, string code = null) => Delete(doc, prefix, host, out _, code);
+        public static int Delete(Document doc, ArbaPrefix prefix, Element host, string code = null, ArbaOriginKind kind = ArbaOriginKind.All)
+            => Delete(doc, prefix, host, out _, code, kind);
     }
 }

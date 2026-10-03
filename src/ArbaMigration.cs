@@ -55,29 +55,48 @@ namespace Arba.Comun
             return list;
         }
 
-        /// <summary>Armaduras alojadas en un anfitrión.</summary>
+        /// <summary>Armaduras alojadas en un anfitrión: las barras por RebarHostData (rápido) y las mallas y refuerzos de sistema por su anfitrión.</summary>
         public static List<Element> RebarOf(Document doc, Element host)
         {
             var list = new List<Element>();
             if (host == null) return list;
-            foreach (Element r in AllRebar(doc))
-                if (ArbaPartition.RebarHostId(r) == host.Id) list.Add(r);
+            var seen = new HashSet<ElementId>();
+            try
+            {
+                RebarHostData hd = RebarHostData.GetRebarHostData(host);
+                if (hd != null)
+                    foreach (Rebar rb in hd.GetRebarsInHost())
+                        if (seen.Add(rb.Id)) list.Add(rb);
+            }
+            catch (Exception) { }
+            foreach (Element r in new FilteredElementCollector(doc).OfClass(typeof(RebarInSystem)).ToElements())
+                if (ArbaPartition.RebarHostId(r) == host.Id && seen.Add(r.Id)) list.Add(r);
+            foreach (Element r in new FilteredElementCollector(doc).OfClass(typeof(FabricSheet)).ToElements())
+                if (ArbaPartition.RebarHostId(r) == host.Id && seen.Add(r.Id)) list.Add(r);
             return list;
         }
 
         /// <summary>Migra todo el modelo (todos los prefijos conocidos).</summary>
-        public static ArbaMigrationResult MigrateAll(Document doc, bool overwriteOrigin = false, string template = null)
-            => Run(doc, AllRebar(doc), null, overwriteOrigin, template);
+        /// <summary>Parámetros que necesita la migración de armaduras: origen, código y Metrado - Elemento.</summary>
+        public static readonly ArbaParam[] RebarParams = { ArbaContract.Origen, ArbaContract.Codigo, ArbaContract.Elemento };
 
-        /// <summary>Migra las armaduras de un anfitrión; con <paramref name="only"/> solo las de ese add-in.</summary>
-        public static ArbaMigrationResult MigrateHost(Document doc, Element host, ArbaPrefix only = null, bool overwriteOrigin = false, string template = null)
-            => Run(doc, RebarOf(doc, host), only, overwriteOrigin, template);
+        public static ArbaMigrationResult MigrateAll(Document doc, bool overwriteOrigin = false, string template = null, IEnumerable<ArbaParam> ensure = null)
+            => Run(doc, AllRebar(doc), null, overwriteOrigin, template, ensure);
+
+        /// <summary>
+        /// Migra las armaduras de un anfitrión; con <paramref name="only"/> solo las de ese add-in. Asegura antes los
+        /// parámetros de <paramref name="ensure"/> (por defecto los ocho del contrato; un add-in de armado puede pasar
+        /// <see cref="RebarParams"/> para crear solo los tres suyos).
+        /// </summary>
+        public static ArbaMigrationResult MigrateHost(Document doc, Element host, ArbaPrefix only = null, bool overwriteOrigin = false, string template = null, IEnumerable<ArbaParam> ensure = null)
+            => Run(doc, RebarOf(doc, host), only, overwriteOrigin, template, ensure);
 
         /// <summary>Migra las armaduras de varios anfitriones (selección).</summary>
-        public static ArbaMigrationResult MigrateHosts(Document doc, IEnumerable<Element> hosts, ArbaPrefix only = null, bool overwriteOrigin = false, string template = null)
+        public static ArbaMigrationResult MigrateHosts(Document doc, IEnumerable<Element> hosts, ArbaPrefix only = null, bool overwriteOrigin = false, string template = null, IEnumerable<ArbaParam> ensure = null)
         {
-            var ids = new HashSet<ElementId>(hosts.Where(h => h != null).Select(h => h.Id));
-            return Run(doc, AllRebar(doc).Where(r => ids.Contains(ArbaPartition.RebarHostId(r))), only, overwriteOrigin, template);
+            var list = new List<Element>();
+            foreach (Element h in hosts) list.AddRange(RebarOf(doc, h));
+            return Run(doc, list, only, overwriteOrigin, template, ensure);
         }
 
         /// <summary>True si el anfitrión tiene armaduras de ese add-in anteriores al contrato (partición antigua y sin origen).</summary>
@@ -91,12 +110,13 @@ namespace Arba.Comun
             return false;
         }
 
-        private static ArbaMigrationResult Run(Document doc, IEnumerable<Element> rebars, ArbaPrefix only, bool overwriteOrigin, string template)
+        private static ArbaMigrationResult Run(Document doc, IEnumerable<Element> rebars, ArbaPrefix only, bool overwriteOrigin, string template, IEnumerable<ArbaParam> ensure)
         {
             var r = new ArbaMigrationResult();
             if (doc == null) return r;
 
-            if (!ArbaSharedParams.EnsureAll(doc, r.Avisos))
+            bool ok = ensure == null ? ArbaSharedParams.EnsureAll(doc, r.Avisos) : ArbaSharedParams.Ensure(doc, ensure, r.Avisos);
+            if (!ok)
                 r.Avisos.Add("No se pudieron asegurar todos los parámetros del contrato; la migración puede quedar incompleta.");
             doc.Regenerate();
 

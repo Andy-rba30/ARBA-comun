@@ -69,16 +69,16 @@ namespace Arba.Comun
         // ------------------------------------------------------------------ asegurar
 
         /// <summary>Asegura todos los parámetros del contrato. Dentro de una transacción. Devuelve false si alguno falló (ver avisos).</summary>
-        public static bool EnsureAll(Document doc, IList<string> warnings)
-        {
-            bool ok = true;
-            foreach (ArbaParam p in ArbaContract.Parametros) ok &= Ensure(doc, p, warnings);
-            return ok;
-        }
+        public static bool EnsureAll(Document doc, IList<string> warnings) => Ensure(doc, ArbaContract.Parametros, warnings);
 
         /// <summary>Asegura los parámetros indicados (p. ej. solo los de ARBA - Origen/Código para un add-in de armado).</summary>
         public static bool Ensure(Document doc, IEnumerable<ArbaParam> parameters, IList<string> warnings)
         {
+            if (doc != null && doc.IsFamilyDocument)
+            {
+                warnings?.Add("Los parámetros del contrato ARBA no se vinculan en un documento de familia; abre un proyecto.");
+                return false;
+            }
             bool ok = true;
             foreach (ArbaParam p in parameters) ok &= Ensure(doc, p, warnings);
             return ok;

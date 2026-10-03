@@ -7,8 +7,9 @@ namespace Arba.Comun
     /// <summary>
     /// Expande la plantilla del parámetro Partición de las barras. Comodines (sin distinguir mayúsculas):
     /// {categoria}, {prefijo}, {marca} (Marca del anfitrión; si está vacía, su Id), {id}, {codigo} (familia o capa
-    /// propia del add-in), {tipo}, {familia} (familia de Revit), {conjunto}. Alias: {capa}, {cara}, {estribo} y
-    /// {ala} valen {codigo}; {familiarevit} vale {familia}. Un comodín vacío se elimina con el separador que lo
+    /// propia del add-in), {tipo}, {familia} (familia de Revit), {conjunto}. Alias: {cara}, {estribo} y {ala} valen
+    /// {codigo}; {capa} vale Source.Layer si el add-in la rellena (Bloques: u / v) y si no {codigo}; {familiarevit}
+    /// vale {familia}. Un comodín vacío se elimina con el separador que lo
     /// acompaña ("VIG-{marca}" con marca vacía da "VIG" y no "VIG-"; "{categoria} - VIG-V1" sin categoría da
     /// "VIG-V1"). El separador de categoría " - " se conserva tal cual.
     /// Unifica las siete copias de PartitionName de los add-ins (misma regla de limpieza que seis de ellas).
@@ -20,6 +21,8 @@ namespace Arba.Comun
             public string Mark = "", Id = "", TypeName = "", FamilyName = "", SetName = "";
             /// <summary>Código propio del add-in: capa, cara, estribo, ala, familia F1..F8.</summary>
             public string Code = "";
+            /// <summary>Subcapa opcional cuando el código ya es otra cosa (Bloques: u / v dentro de F1). {capa} la usa si está; si no, usa Code.</summary>
+            public string Layer = "";
             public string Category = "", Prefix = "";
         }
 
@@ -41,7 +44,8 @@ namespace Arba.Comun
                     case "prefijo": return (s.Prefix ?? "").Trim();
                     case "marca": return mark;
                     case "id": return (s.Id ?? "").Trim();
-                    case "codigo": case "capa": case "cara": case "estribo": case "ala": return (s.Code ?? "").Trim();
+                    case "capa": return !string.IsNullOrWhiteSpace(s.Layer) ? s.Layer.Trim() : (s.Code ?? "").Trim();
+                    case "codigo": case "cara": case "estribo": case "ala": return (s.Code ?? "").Trim();
                     case "tipo": return (s.TypeName ?? "").Trim();
                     case "familia": case "familiarevit": return (s.FamilyName ?? "").Trim();
                     case "conjunto": return (s.SetName ?? "").Trim();

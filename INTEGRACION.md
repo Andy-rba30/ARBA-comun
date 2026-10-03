@@ -34,7 +34,10 @@ En el `.csproj`, después del `PropertyGroup` principal:
 ```
 
 El `.props` compila `external/ARBA-comun/src/**/*.cs` dentro del ensamblado del add-in (clases `internal` en
-`namespace Arba.Comun`) y define `REVIT2027` (o la versión indicada). No añade paquetes: el add-in sigue trayendo
+`namespace Arba.Comun`), define `REVIT2027` (o la versión indicada) y, desde 1.0.3, excluye la carpeta del submódulo
+del glob por defecto del SDK (`DefaultItemExcludes`): sin eso `**/*.cs` compilaba `src/` dos veces (CS2002) y
+arrastraba `tests/` y `build/` del común. Con versiones anteriores hay que ponerlo en el `.csproj`, **antes** del
+`Import`: `<DefaultItemExcludes>$(DefaultItemExcludes);external/**</DefaultItemExcludes>`. No añade paquetes: el add-in sigue trayendo
 `Nice3point.Revit.Api.RevitAPI/RevitAPIUI` (o `RevitAPI.dll` por `HintPath`) y `UseWPF`. Un proyecto que referencia
 `RevitAPI.dll` por `HintPath` puede añadir, como respaldo para compilar sin Revit (Linux, CI), los paquetes
 `Nice3point.Revit.Api.*` con `Condition="!Exists('$(RevitInstallDir)\RevitAPI.dll')"` y `ExcludeAssets="runtime"`.
@@ -83,7 +86,10 @@ rearmar** → dentro de la `SubTransaction` del elemento `ArbaOrigin.Delete(doc,
 de `Build`; **Conservar** → se arma encima (duplica). Un botón "Borrar armado del add-in" en la ventana es opcional.
 
 Barras anteriores al contrato (partición antigua, sin origen): `ArbaMigration.HasLegacy(doc, host, prefijo)` → ofrece
-`ArbaMigration.MigrateHost(doc, host, prefijo)` antes de rearmar; así pasan a reconocerse como propias.
+`ArbaMigration.MigrateHost(doc, host, prefijo)` antes de rearmar; así pasan a reconocerse como propias. Por defecto la
+migración asegura los ocho parámetros del contrato; un add-in de armado puede limitarlo a los tres suyos con
+`ensure: ArbaMigration.RebarParams`. Un add-in que crea armaduras y otros elementos (Bloques) borra cada grupo por
+separado con `ArbaOrigin.Delete(..., kind: ArbaOriginKind.Rebar)` / `ArbaOriginKind.NotRebar`.
 
 ## 7. Migración de modelos existentes: botón "Migrar particiones y origen"
 

@@ -301,6 +301,8 @@ namespace Arba.Comun.Tests
             Eq(PartitionName.Expand("COL-{marca}-{estribo}", new PartitionName.Source { Mark = "C1", Code = "2" }), "COL-C1-2", "columnas: {estribo} es alias de {codigo}");
             Eq(PartitionName.Expand("MC-{marca}-{ala}", new PartitionName.Source { Mark = "M1", Code = "ala A" }), "MC-M1-ala A", "muros: {ala} es alias de {codigo}");
             Eq(PartitionName.Expand("{familia}|{familiarevit}", new PartitionName.Source { FamilyName = "Zapata" }), "Zapata|Zapata", "{familia} y {familiarevit} son la familia de Revit");
+            Eq(PartitionName.Expand("BLQ-{marca}-{codigo}-{capa}", new PartitionName.Source { Mark = "FT-01", Code = "F1", Layer = "u" }), "BLQ-FT-01-F1-u", "bloques: {capa} es la subcapa u/v cuando se rellena Layer");
+            Eq(PartitionName.Expand("{capa}", new PartitionName.Source { Code = "inferior" }), "inferior", "{capa} sin Layer sigue valiendo {codigo}");
             Eq(PartitionName.Expand("{tipo} {marca}", new PartitionName.Source { TypeName = "30x60", Mark = "V1" }), "30x60 V1", "tipo y marca con espacio");
             Eq(PartitionName.Expand("{MARCA}", new PartitionName.Source { Mark = "x" }), "x", "comodín en mayúsculas");
             Eq(PartitionName.Expand("{desconocido}-{marca}", new PartitionName.Source { Mark = "x" }), "{desconocido}-x", "comodín desconocido se conserva");
