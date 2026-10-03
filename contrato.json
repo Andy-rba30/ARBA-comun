@@ -104,8 +104,8 @@
       "tipo": "texto",
       "ejemplar": true,
       "categorias": ["OST_Rebar", "OST_FabricReinforcement", "OST_StructuralFraming", "OST_StructuralColumns", "OST_StructuralFoundation", "OST_Floors", "OST_Walls", "OST_StructuralStiffener", "OST_StructConnections", "OST_GenericModel", "OST_Roofs"],
-      "valores": ["VIGAS", "COLUMNAS", "CIMIENTOS", "LOSAS", "MUROS", "CONEXIONES", "OTROS"],
-      "escribe": ["Exportacion-metrados-excel (siempre, en cada metrado: grupo del elemento o del anfitrión del refuerzo)", "cada add-in de armado al crear, con la CATEGORIA de la partición (prerrelleno)"],
+      "valores": ["VIGAS", "COLUMNAS", "CIMIENTOS", "LOSAS", "MUROS", "CONEXIONES", "OTROS", "MISCELANEOS"],
+      "escribe": ["Exportacion-metrados-excel (siempre, en cada metrado: grupo del elemento o del anfitrión del refuerzo; MISCELANEOS si el elemento tiene Metrado - Partida)", "cada add-in de armado al crear, con la CATEGORIA de la partición (prerrelleno); MISCELANEOS en rejillas y ángulos"],
       "lee": ["Exportacion-metrados-excel: filtro de las tablas por elemento y de los filtros de vista"],
       "descripcion": "Grupo de metrado. Ya existía en el plugin con este GUID; se incorpora al contrato porque es el filtro real de las tablas de acero y sus valores coinciden con la CATEGORIA de la partición."
     }

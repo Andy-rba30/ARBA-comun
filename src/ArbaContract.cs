@@ -98,6 +98,8 @@ namespace Arba.Comun
         public const string CatOtros = "OTROS";
         /// <summary>Grupo "Conexiones y anclajes" del plugin de metrados (solo en "Metrado - Elemento").</summary>
         public const string ElementoConexiones = "CONEXIONES";
+        /// <summary>Grupo de los misceláneos con "Metrado - Partida" (rejillas, ángulos): su propia tabla, fuera de Vigas/Otros.</summary>
+        public const string ElementoMiscelaneos = "MISCELANEOS";
 
         public static readonly string[] Categories = { CatCimientos, CatVigas, CatColumnas, CatLosas, CatMuros };
 
@@ -228,7 +230,7 @@ namespace Arba.Comun
 
         public static readonly ArbaParam Elemento = new ArbaParam("Elemento", "Metrado - Elemento", "9A4C7E21-3B5D-4F8A-A6C2-2D3E4F5A6B7C",
             ArbaParamType.Text, Join(CatRefuerzo, CatAnfitriones),
-            "Grupo de metrado: VIGAS, COLUMNAS, CIMIENTOS, LOSAS, MUROS, CONEXIONES u OTROS (en el refuerzo, el del anfitrión).");
+            "Grupo de metrado: VIGAS, COLUMNAS, CIMIENTOS, LOSAS, MUROS, CONEXIONES, OTROS o MISCELANEOS (en el refuerzo, el del anfitrión).");
 
         public static readonly ArbaParam[] Parametros = { Origen, Codigo, Anfitrion, Partida, Material, Peso, Pernos, Elemento };
 

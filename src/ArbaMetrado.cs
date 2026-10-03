@@ -4,12 +4,15 @@ namespace Arba.Comun
 {
     /// <summary>
     /// Escritura de los parámetros de metrado del contrato en elementos que un add-in crea con peso propio
-    /// (rejillas, ángulos): partida, material, peso y pernos. El plugin de metrados respeta el peso de estos
-    /// elementos (ver <see cref="PesoProtegido"/>).
+    /// (rejillas, ángulos): partida, material, peso, pernos y el grupo MISCELANEOS. El plugin de metrados respeta
+    /// el peso de estos elementos (ver <see cref="PesoProtegido"/>) y los metra en su tabla de misceláneos.
     /// </summary>
     internal static class ArbaMetrado
     {
-        /// <summary>Escribe partida, material (ACERO ESTRUCTURAL por defecto), peso en kg y pernos. Los nulos no se tocan.</summary>
+        /// <summary>
+        /// Escribe partida, material (ACERO ESTRUCTURAL por defecto), peso en kg, pernos y "Metrado - Elemento" =
+        /// MISCELANEOS. Los nulos no se tocan.
+        /// </summary>
         public static void WriteMiscelaneo(Element e, string partida, double? pesoKg, int? pernos = null, string material = ArbaContract.MaterialAceroEstructural)
         {
             if (e == null) return;
@@ -17,6 +20,7 @@ namespace Arba.Comun
             if (!string.IsNullOrWhiteSpace(material)) ArbaSharedParams.SetText(e, ArbaContract.Material, material.Trim().ToUpperInvariant());
             if (pesoKg.HasValue) ArbaSharedParams.SetDouble(e, ArbaContract.Peso, System.Math.Round(pesoKg.Value, 3));
             if (pernos.HasValue) ArbaSharedParams.SetInteger(e, ArbaContract.Pernos, pernos.Value);
+            ArbaSharedParams.SetText(e, ArbaContract.Elemento, ArbaContract.ElementoMiscelaneos);
         }
 
         /// <summary>
@@ -24,6 +28,9 @@ namespace Arba.Comun
         /// y un peso mayor que cero escrito por su add-in.
         /// </summary>
         public static bool PesoProtegido(Element e) => ArbaOrigin.IsArba(e) && ArbaSharedParams.GetDouble(e, ArbaContract.Peso) > 0;
+
+        /// <summary>True si el elemento es un misceláneo del contrato (tiene "Metrado - Partida").</summary>
+        public static bool EsMiscelaneo(Element e) => ArbaSharedParams.GetText(e, ArbaContract.Partida).Trim().Length > 0;
 
         /// <summary>Escribe "Metrado - Elemento" (grupo de metrado) si el elemento tiene el parámetro.</summary>
         public static bool WriteElemento(Element e, string grupo) => ArbaSharedParams.SetText(e, ArbaContract.Elemento, (grupo ?? "").Trim().ToUpperInvariant());
