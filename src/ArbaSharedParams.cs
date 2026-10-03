@@ -364,11 +364,8 @@ namespace Arba.Comun
                 var existing = group.Definitions.get_Item(p.Name) as ExternalDefinition;
                 if (existing != null) return existing;
 
-#if REVIT2021
+                // DataTypeOf devuelve ParameterType en 2021 y ForgeTypeId (SpecTypeId) desde 2022
                 var options = new ExternalDefinitionCreationOptions(p.Name, DataTypeOf(p.Type))
-#else
-                var options = new ExternalDefinitionCreationOptions(p.Name, DataTypeOf(p.Type))
-#endif
                 {
                     GUID = p.Guid,
                     Description = p.Description ?? string.Empty,
