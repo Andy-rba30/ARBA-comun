@@ -231,6 +231,10 @@ namespace Arba.Comun.Tests
             Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("CIMIENTOS")), "CIMIENTOS", "solo categoría declara su categoría");
             Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("LOSAS - MAN-Losa 20")), "LOSAS", "MAN declara lo que dice el texto");
             Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("Muro de contención")), "", "texto libre no declara nada");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("CIMIENTOS - SOBRECIMIENTOS")), "CIMIENTOS", "1.0.5: categoría + texto libre declara la categoría");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("cimientos - Sobrecimiento eje 3")), "CIMIENTOS", "1.0.5: sin distinguir mayúsculas");
+            Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("SOBRECIMIENTOS")), "", "texto libre sin categoría sigue al anfitrión");
+            Check(ArbaPartition.Parse("CIMIENTOS - SOBRECIMIENTOS").Kind == ArbaPartitionKind.Unknown, "categoría + texto libre no es ARBA (la migración no la toca)");
             Eq(ArbaPartition.DeclaredCategory(ArbaPartition.Parse("")), "", "vacía no declara nada");
             Eq(ArbaPartition.DeclaredCategory(null), "", "nula no declara nada");
             ArbaPartitionInfo cco = ArbaPartition.Parse("LOSAS - CCO-476232");

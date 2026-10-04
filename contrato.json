@@ -1,6 +1,6 @@
 {
   "contrato": "ARBA-comun",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "descripcion": "Contrato compartido por los add-ins de Revit ARBA: parámetros compartidos con GUID fijo, regla de partición del acero, cinta y compatibilidad. Lo validan los tests de tests/ contra src/ArbaContract.cs.",
 
   "conjuntosCategorias": {
@@ -119,7 +119,7 @@
     "marcaVaciaUsaId": true,
     "marcaVaciaMAN": "tipo",
     "categoriaPorDefecto": "OTROS",
-    "categoriaFijaDelPrefijo": "Desde 1.0.4 la CATEGORIA es la que fija el prefijo ('categoria' de cada prefijo: ZAP, CCO y BLQ → CIMIENTOS; VIG, COL, LOS, MUR → la suya) aunque el anfitrión esté modelado como otra cosa (una zapata o un cimiento corrido dibujados como suelo siguen siendo CIMIENTOS). Con 'categoria' null (MCO: pantalla MUROS y zapata CIMIENTOS; MAN) se usa la categoría del anfitrión según 'categorias'. 'Metrado - Elemento' sigue la misma regla (ArbaMetrado.ElementoFor): la categoría que declara la partición y, si no declara ninguna, la del anfitrión.",
+    "categoriaFijaDelPrefijo": "Desde 1.0.4 la CATEGORIA es la que fija el prefijo ('categoria' de cada prefijo: ZAP, CCO y BLQ → CIMIENTOS; VIG, COL, LOS, MUR → la suya) aunque el anfitrión esté modelado como otra cosa (una zapata o un cimiento corrido dibujados como suelo siguen siendo CIMIENTOS). Con 'categoria' null (MCO: pantalla MUROS y zapata CIMIENTOS; MAN) se usa la categoría del anfitrión según 'categorias'. 'Metrado - Elemento' sigue la misma regla (ArbaMetrado.ElementoFor): la categoría que declara la partición y, si no declara ninguna, la del anfitrión. Desde 1.0.5 una partición escrita a mano que empiece por una categoría del contrato ('CIMIENTOS - SOBRECIMIENTOS') declara esa categoría aunque el resto sea texto libre.",
     "categorias": {
       "CIMIENTOS": ["OST_StructuralFoundation"],
       "VIGAS": ["OST_StructuralFraming"],

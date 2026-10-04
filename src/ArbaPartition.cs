@@ -99,15 +99,16 @@ namespace Arba.Comun
 
         /// <summary>
         /// Categoría que declara una partición ya escrita, para que "Metrado - Elemento" la respete: la fija del
-        /// prefijo si lo tiene (así "LOSAS - CCO-12" sigue siendo CIMIENTOS), si no la categoría del texto
-        /// ("MUROS - MCO-M1", "CIMIENTOS"); "" si la partición no declara ninguna (antigua "MC-M1", texto libre).
+        /// prefijo si lo tiene (así "LOSAS - CCO-12" sigue siendo CIMIENTOS), si no la categoría con la que empieza
+        /// el texto ("MUROS - MCO-M1", "CIMIENTOS", y desde 1.0.5 también texto libre tras la categoría:
+        /// "CIMIENTOS - SOBRECIMIENTOS" escrito a mano se metra en Cimentaciones); "" si la partición no empieza por
+        /// una categoría del contrato (antigua "MC-M1", "Muro de contención").
         /// </summary>
         public static string DeclaredCategory(ArbaPartitionInfo info)
         {
             if (info == null) return "";
             if (info.IsArba && info.PrefixInfo != null && !string.IsNullOrWhiteSpace(info.PrefixInfo.Category)) return Normalize(info.PrefixInfo.Category);
-            if (info.IsArba || info.Kind == ArbaPartitionKind.CategoryOnly) return Normalize(info.Category);
-            return "";
+            return Normalize(info.Category);
         }
 
         /// <summary>Texto de categoría normalizado (mayúsculas, sin espacios sobrantes); "" si es nulo.</summary>

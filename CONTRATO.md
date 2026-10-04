@@ -1,4 +1,4 @@
-# Contrato ARBA-comun — versión 1.0.4
+# Contrato ARBA-comun — versión 1.0.5
 
 Este documento describe lo que todos los add-ins ARBA comparten. La fuente de verdad legible por máquina es
 `contrato.json`; el código la refleja en `src/ArbaContract.cs` y los tests de `tests/` comprueban que los tres
@@ -57,7 +57,9 @@ Decisiones:
 - `Metrado - Elemento` sigue la misma regla (`ArbaMetrado.ElementoFor`): la categoría que **declara la partición**
   (la fija de su prefijo, o la del texto en `MUROS - MCO-M1` y en las de solo categoría como `CIMIENTOS`) y, solo si
   la partición no declara ninguna (texto libre, antigua `MC-M1`, vacía), la del anfitrión. Una partición
-  `CIMIENTOS` escrita a mano en barras de un suelo se metra en Cimentaciones.
+  `CIMIENTOS` escrita a mano en barras de un suelo se metra en Cimentaciones. Desde 1.0.5 basta con que el texto
+  **empiece** por una categoría del contrato: `CIMIENTOS - SOBRECIMIENTOS` escrito a mano en barras alojadas en un
+  muro se metra en Cimentaciones y conserva su etiqueta; `SOBRECIMIENTOS` a secas sigue al anfitrión (Muros).
 - **Separador de categoría**: ` - ` (espacio, guion, espacio). **Separador de campos**: `-`.
 - **{marca}**: parámetro Marca del anfitrión; si está vacía, su Id. Excepción: con el prefijo `MAN` (acero no
   creado por ARBA) una marca vacía usa el **nombre del tipo** del anfitrión (`CIMIENTOS - MAN-Z1_1.5x1.5m`), que
@@ -134,9 +136,10 @@ armar un anfitrión con barras antiguas suyas pueden migrarlas con `ArbaMigratio
 - **Historial**: 1.0.1 el peso protegido excluye armaduras; 1.0.2 `MAN` sin marca usa el nombre del tipo; 1.0.3 el
   `.props` excluye el submódulo del glob del SDK y `{capa}` tiene subcapa propia; 1.0.4 categoría fija por prefijo
   (`ArbaPrefix.Category`, `ArbaPartition.CategoryFor`), `Metrado - Elemento` respeta la categoría que declara la
-  partición (`ArbaMetrado.ElementoFor`) y la migración corrige categoría y elemento. Ningún GUID, nombre, prefijo ni
-  comodín ha cambiado: los add-ins integrados solo actualizan el submódulo y recompilan; el plugin de metrados
-  cambia una línea (`PROMPTS/09-Exportacion-metrados-excel-1.0.4.md`).
+  partición (`ArbaMetrado.ElementoFor`) y la migración corrige categoría y elemento; 1.0.5 una partición manual que
+  empieza por una categoría del contrato (`CIMIENTOS - SOBRECIMIENTOS`) declara esa categoría. Ningún GUID, nombre,
+  prefijo ni comodín ha cambiado: los add-ins integrados solo actualizan el submódulo y recompilan; el plugin de
+  metrados cambió una línea en 1.0.4 (`PROMPTS/09-Exportacion-metrados-excel-1.0.4.md`) y nada en 1.0.5.
 - **PATCH**: descripciones, iconos, textos de botón, documentación.
 - **Parámetros antiguos**: `ArbaSharedParams.Ensure` busca un parámetro vinculado con el mismo nombre; si su GUID es
   el del contrato solo completa las categorías; si es un parámetro de proyecto no compartido o con otro GUID, crea
