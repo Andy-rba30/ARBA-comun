@@ -47,9 +47,10 @@ modelados como suelo y desharía lo que escriben los add-ins y la migración.
    una armadura ARBA con `ArbaPartition.CategoryOf(host)`, cámbialo por `ArbaPartition.DeclaredCategory(ArbaPartition.ParseOf(r))`
    con respaldo en la del anfitrión (`ArbaMetrado.ElementoFor` ya lo hace). Si no hay ningún sitio así, no inventes
    cambios.
-5. **Tests de consola** (si los hay en `src/ExportacionMetrados.Tests` o similar): añade comprobaciones de que
+5. **Tests**: el plugin no tiene proyecto de tests propio; las comprobaciones
    `ArbaPartition.DeclaredCategory(ArbaPartition.Parse("LOSAS - CCO-12")) == "CIMIENTOS"` y
-   `ArbaPartition.CategoryFor(ArbaContract.CimientosCorridos, "LOSAS") == "CIMIENTOS"`.
+   `ArbaPartition.CategoryFor(ArbaContract.CimientosCorridos, "LOSAS") == "CIMIENTOS"` están en
+   `external/ARBA-comun/tests` (`cd external/ARBA-comun/tests && dotnet run`); ejecútalas.
 6. **`NOTAS-ARBA-COMUN.md`**: añade una entrada "1.0.4" con lo que cambiaste y cualquier incidencia del común.
 7. Compila (`dotnet build -c Release`, con `EnableWindowsTargeting` si no estás en Windows) y pasa los tests.
    Confirma con un mensaje claro y detente: el usuario prueba en Revit antes de fusionar.

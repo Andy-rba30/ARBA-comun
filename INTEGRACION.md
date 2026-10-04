@@ -177,4 +177,6 @@ la partición.
 | Exportacion-metrados-excel | `PROMPTS/09-Exportacion-metrados-excel-1.0.4.md`: una línea en `ClasificadorElementos.RellenarElementoRefuerzo` (usar `ArbaMetrado.ElementoFor`) + submódulo | "Metrado automático" sobrescribe siempre `Metrado - Elemento` con la categoría del anfitrión; sin este cambio volvería a poner `LOSAS` en el acero de un cimiento modelado como suelo |
 
 En los modelos ya armados con 1.0.3: botón **Migrar particiones y origen** (corrige `LOSAS - CCO-…` →
-`CIMIENTOS - CCO-…` y el elemento) y después **Metrado automático**. No hace falta rearmar.
+`CIMIENTOS - CCO-…` y el elemento) y después **Metrado automático**. No hace falta rearmar. Migrar antes de
+regenerar los filtros de vista: su respaldo por texto de partición ("empieza por `CATEGORIA - `", solo cuando falta
+`Metrado - Elemento`) seguiría poniendo una `LOSAS - CCO-…` sin migrar en el filtro de Losas.

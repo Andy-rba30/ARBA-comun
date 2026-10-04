@@ -43,7 +43,9 @@ namespace Arba.Comun
         /// "MUROS - MCO-M1", "CIMIENTOS") y, si la partición no declara ninguna (texto libre, antigua "MC-M1", vacía),
         /// <paramref name="hostGroup"/> (el grupo que el plugin de metrados asigna a la categoría del anfitrión) o,
         /// en su defecto, la categoría del anfitrión; OTROS sin anfitrión. Así una zapata o un cimiento modelados
-        /// como suelo se metran en Cimentaciones y no en Losas.
+        /// como suelo se metran en Cimentaciones y no en Losas. <paramref name="hostGroup"/> se devuelve tal cual
+        /// (en mayúsculas), sin validarlo contra las categorías del contrato: el plugin pasa grupos propios como
+        /// CONEXIONES.
         /// </summary>
         public static string ElementoFor(Element rebar, Element host, string hostGroup = null)
         {
